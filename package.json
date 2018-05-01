@@ -1,5 +1,5 @@
 {
-  "name": "routesmanager",
+  "name": "FetchREST",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,8 @@
     "lint": "yarn lint:ts && yarn lint:tslint && yarn lint:eslint",
     "lint:ts": "tsc --noEmit",
     "lint:eslint": "eslint src --ext .ts",
-    "lint:tslint": "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
+    "lint:tslint":
+      "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
     "test": "jest",
     "ci": "yarn lint && yarn test",
     "build": "tsc"
