@@ -82,7 +82,7 @@ await request.get(
 );
 ```
 
-## 🏗Contributing
+## 🏗 Contributing
 1. Make your changes.
 2. Add/Alter the appropriate tests.
 3. Make sure all tests pass (`yarn ci`).
