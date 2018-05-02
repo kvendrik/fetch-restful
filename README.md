@@ -1,4 +1,4 @@
-# [WIP] FetchREST
+# [WIP] FetchREST(ful)
 [![CircleCI](https://circleci.com/gh/kvendrik/fetch-rest.svg?style=svg)](https://circleci.com/gh/kvendrik/fetch-rest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -6,7 +6,7 @@
 
 ## Installation
 ```
-yarn add fetch-rest
+yarn add fetch-restful
 ```
 
 ## Usage
