@@ -32,7 +32,7 @@ await request.delete('/users', Payload, RequestOptions);
 
 * [**`QueryObject`**](https://github.com/kvendrik/fetch-rest/blob/master/src/queryObjectToString.ts#L1) - object with query parameters to use.
 * [**`Payload`**](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L4) - your request payload.
-* [**`RequestOptions`**](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L16) - request options that will be merged with your global request options.
+* [**`RequestOptions`**](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L18) - request options that will be merged with your global request options.
 
 ## Examples
 
