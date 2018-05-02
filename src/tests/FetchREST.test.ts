@@ -1,6 +1,8 @@
 import * as fetchMock from 'fetch-mock';
 import FetchREST from '../';
 
+type MockRequestOptions = fetchMock.MockResponseObject;
+
 beforeEach(() => fetchMock.restore());
 
 describe('GET', () => {
@@ -31,9 +33,9 @@ describe('GET', () => {
     });
 
     await request.get('/users');
-    const {headers}: any = requestMock.lastOptions();
-    expect(headers.Accept).toBe('application/json');
-    expect(headers['Content-Type']).toBe('application/json');
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('application/json');
+    expect(headers!['Content-Type']).toBe('application/json');
   });
 
   it('allows for local overwrite of options', async () => {
@@ -59,8 +61,8 @@ describe('GET', () => {
       },
     );
 
-    const {headers}: any = requestMock.lastOptions();
-    expect(headers.Accept).toBe('text/xml');
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
     expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
   });
 
@@ -75,7 +77,9 @@ describe('GET', () => {
 
     await request.get('/users');
 
-    const {apiUrl}: any = requestMock.lastOptions();
+    const {apiUrl} = requestMock.lastOptions() as MockRequestOptions & {
+      apiUrl?: string;
+    };
     expect(apiUrl).toBeUndefined();
   });
 
@@ -168,7 +172,7 @@ describe('POST', () => {
     };
 
     await request.post('/users', payload);
-    const {body}: any = requestMock.lastOptions();
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
     expect(body).toBe(JSON.stringify(payload));
   });
 
@@ -184,7 +188,7 @@ describe('POST', () => {
     const payload = 'userid=214121&paid=true&registered=true';
 
     await request.post('/users', payload);
-    const {body}: any = requestMock.lastOptions();
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
     expect(body).toBe(payload);
   });
 });

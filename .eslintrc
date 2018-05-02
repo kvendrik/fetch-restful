@@ -11,7 +11,8 @@
     "import/extensions": "off",
     "jsx-a11y/anchor-is-valid": "off",
     "typescript/no-unused-vars": "error",
-    "no-restricted-globals": "off"
+    "no-restricted-globals": "off",
+    "no-use-before-define": "off"
   },
   "env": {
     "browser": true,
