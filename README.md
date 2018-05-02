@@ -1,5 +1,5 @@
 # [WIP] FetchREST(ful)
-[![CircleCI](https://circleci.com/gh/kvendrik/fetch-rest.svg?style=svg)](https://circleci.com/gh/kvendrik/fetch-rest)
+[![CircleCI](https://circleci.com/gh/kvendrik/fetch-restful.svg?style=svg)](https://circleci.com/gh/kvendrik/fetch-restful)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 🚀 A wrapper around fetch for REST API dependent projects.
