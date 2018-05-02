@@ -41,7 +41,7 @@ export type GlobalRequestOptions = RequestOptions & {
 };
 
 export default class FetchREST {
-  private globalOptions: any;
+  private globalOptions: GlobalRequestOptions;
 
   constructor(options: GlobalRequestOptions) {
     this.globalOptions = options;
