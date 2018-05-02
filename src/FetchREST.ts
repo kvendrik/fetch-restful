@@ -125,14 +125,14 @@ export default class FetchREST {
 
       const textBody = await res.text();
 
-      let jsonBody;
+      let finalBody;
       try {
-        jsonBody = JSON.parse(textBody);
-      } catch (err) {
-        throw err;
+        finalBody = JSON.parse(textBody);
+      } catch (error) {
+        finalBody = textBody;
       }
 
-      return {...resData, body: jsonBody};
+      return {...resData, body: finalBody};
     });
 
     if (!this.requestMiddleware) {

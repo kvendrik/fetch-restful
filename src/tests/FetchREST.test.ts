@@ -125,6 +125,20 @@ describe('get', () => {
     expect(typeof body).toBe('object');
   });
 
+  it('returns non-JSON it gets back as plain text', async () => {
+    fetchMock.getOnce('*', {
+      status: 403,
+      body: 'Forbidden.',
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const {body} = await request.get('/users');
+    expect(body).toBe('Forbidden.');
+  });
+
   it('returns a success boolean', async () => {
     fetchMock.getOnce('*', {
       status: 200,
