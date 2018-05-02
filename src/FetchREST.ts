@@ -80,7 +80,18 @@ export default class FetchREST {
     payload: Payload,
     options: RequestOptions = {},
   ) {
-    const fetchOptions = {...(this.globalOptions as RequestInit), ...options};
+    const {globalOptions} = this;
+    const fetchOptions = {
+      ...(globalOptions as RequestInit),
+      ...options,
+    };
+
+    if (globalOptions.headers && options.headers) {
+      fetchOptions.headers = {
+        ...globalOptions.headers,
+        ...options.headers,
+      };
+    }
 
     const {apiUrl} = fetchOptions;
     delete fetchOptions.apiUrl;

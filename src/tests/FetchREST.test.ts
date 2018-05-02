@@ -66,6 +66,34 @@ describe('GET', () => {
     expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
   });
 
+  it('merges global headers with nested local headers', async () => {
+    const requestMock = fetchMock.getOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+
+    await request.get(
+      '/users',
+      {},
+      {
+        headers: {
+          Accept: 'text/xml',
+        },
+      },
+    );
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(headers!['Content-Type']).toBe('application/json');
+  });
+
   it('does not pass the API URL to the fetch options', async () => {
     const requestMock = fetchMock.getOnce('*', {
       status: 200,
