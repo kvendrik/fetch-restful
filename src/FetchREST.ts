@@ -13,6 +13,8 @@ export interface Headers {
   [key: string]: string;
 }
 
+type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
+
 export interface RequestOptions {
   apiUrl?: string;
   headers?: Headers;
@@ -73,43 +75,45 @@ export default class FetchREST {
   }
 
   private request(
-    method: string,
+    method: RequestMethod,
     endpoint: string,
     payload: Payload,
     options: RequestOptions = {},
   ) {
-    const fetchOptions = {...this.globalOptions, ...options};
+    const fetchOptions = {...(this.globalOptions as RequestInit), ...options};
 
     const {apiUrl} = fetchOptions;
     delete fetchOptions.apiUrl;
 
-    fetchOptions.method = method.toUpperCase();
+    fetchOptions.method = method;
     fetchOptions.body =
       payload !== null && typeof payload === 'object'
         ? JSON.stringify(payload)
         : payload;
 
-    return fetch(`${apiUrl}${endpoint}`, fetchOptions).then(async res => {
-      const resData: Response = {
-        success: res.ok,
-        status: res.status,
-        body: {},
-      };
+    return fetch(`${apiUrl}${endpoint}`, fetchOptions as RequestInit).then(
+      async res => {
+        const resData: Response = {
+          success: res.ok,
+          status: res.status,
+          body: {},
+        };
 
-      if (!res.body) {
-        return {...resData, body: null};
-      }
+        if (!res.body) {
+          return {...resData, body: null};
+        }
 
-      const textBody = await res.text();
+        const textBody = await res.text();
 
-      let jsonBody;
-      try {
-        jsonBody = JSON.parse(textBody);
-      } catch (err) {
-        throw err;
-      }
+        let jsonBody;
+        try {
+          jsonBody = JSON.parse(textBody);
+        } catch (err) {
+          throw err;
+        }
 
-      return {...resData, body: jsonBody};
-    });
+        return {...resData, body: jsonBody};
+      },
+    );
   }
 }
