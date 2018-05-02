@@ -5,5 +5,5 @@ module.exports = {
   },
   automock: false,
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
-  moduleFileExtensions: ['ts'],
+  moduleFileExtensions: ['ts', 'js'],
 };
