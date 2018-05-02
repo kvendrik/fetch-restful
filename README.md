@@ -19,7 +19,7 @@ yarn add fetch-restful
 const request = new FetchREST(GlobalRequestOptions);
 ```
 
-- [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L39).
+- [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L39) - request options that will be used as the defaults for every outgoing request.
 
 ### Request methods.
 ```ts
@@ -35,12 +35,12 @@ await request.delete('/users', Payload, RequestOptions);
 * [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L18) - request options that will be merged with your global request options.
 
 ### Middleware
-Use the middleware method to define a function that will be ran every time a request goes out.
+Use the middleware method to define a function that will be added to the promise chain for all outgoing requests.
 ```ts
 request.middleware(Middleware);
 ```
 
-- [Middleware](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L45).
+- [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L45) - method that will be added to the promise chain.
 
 ## Examples
 
