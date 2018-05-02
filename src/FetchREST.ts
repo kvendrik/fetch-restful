@@ -1,7 +1,7 @@
 import 'whatwg-fetch';
 import queryObjectToString, {QueryObject} from './queryObjectToString';
 
-export type Payload = object | string;
+export type Payload = object | string | null;
 
 export interface Response {
   success: boolean;
@@ -49,7 +49,7 @@ export default class FetchREST {
 
   get(endpoint: string, query: QueryObject = {}, options: RequestOptions = {}) {
     const queryString = queryObjectToString(query);
-    return this.request('GET', `${endpoint}${queryString}`, {}, options);
+    return this.request('GET', `${endpoint}${queryString}`, null, options);
   }
 
   post(endpoint: string, payload: Payload = {}, options: RequestOptions = {}) {
@@ -75,7 +75,7 @@ export default class FetchREST {
   private request(
     method: string,
     endpoint: string,
-    payload: any,
+    payload: Payload,
     options: RequestOptions = {},
   ) {
     const fetchOptions = {...this.globalOptions, ...options};
@@ -85,7 +85,9 @@ export default class FetchREST {
 
     fetchOptions.method = method.toUpperCase();
     fetchOptions.body =
-      typeof payload === 'object' ? JSON.stringify(payload) : payload;
+      payload !== null && typeof payload === 'object'
+        ? JSON.stringify(payload)
+        : payload;
 
     return fetch(`${apiUrl}${endpoint}`, fetchOptions).then(async res => {
       const resData: Response = {

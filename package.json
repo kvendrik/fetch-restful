@@ -1,9 +1,9 @@
 {
   "name": "fetch-restful",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
     "lint": "yarn lint:ts && yarn lint:tslint && yarn lint:eslint",
     "lint:ts": "tsc --noEmit",
@@ -12,7 +12,8 @@
       "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
     "test": "jest",
     "ci": "yarn lint && yarn test",
-    "build": "tsc"
+    "build": "tsc",
+    "postinstall": "rm -rf build && yarn build"
   },
   "author": "Koen Vendrik <k.vendrik@gmail.com>",
   "license": "MIT",
