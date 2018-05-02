@@ -1,7 +1,7 @@
 {
   "name": "fetch-restful",
   "version": "1.0.1",
-  "description": "",
+  "description": "A wrapper around fetch for REST API dependent projects.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {

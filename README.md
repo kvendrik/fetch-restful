@@ -15,13 +15,15 @@ yarn add fetch-restful
 ## Usage
 
 ### Constructor
+
 ```ts
 const request = new FetchREST(GlobalRequestOptions);
 ```
 
-- [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L41) - request options that will be used as the defaults for every outgoing request.
+* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L41) - request options that will be used as the defaults for every outgoing request.
 
 ### Request methods.
+
 ```ts
 await request.get('/users', QueryObject, RequestOptions);
 await request.post('/users', Payload, RequestOptions);
@@ -35,12 +37,14 @@ await request.delete('/users', Payload, RequestOptions);
 * [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L18) - request options that will be merged with your global request options.
 
 ### Middleware
+
 Use the middleware method to define a function that will be added to the promise chain for all outgoing requests.
+
 ```ts
 request.middleware(Middleware);
 ```
 
-- [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L45) - method that will be added to the promise chain.
+* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L45) - method that will be added to the promise chain.
 
 ## Examples
 
@@ -94,16 +98,19 @@ await request.get(
 
 ```ts
 const request = new FetchREST({
-  apiUrl: 'https://non-existent-url/users',
+  apiUrl: 'https://non-existent-url',
 });
 
-fetchRest.middleware(request => request.catch((error) => console.log('ERROR', error)));
+fetchRest.middleware(request =>
+  request.catch(error => console.log('ERROR', error)),
+);
 
 await request.get('/users/kvendrik');
 ```
 
 ## 🏗 Contributing
-1. Make your changes.
-2. Add/Alter the appropriate tests.
-3. Make sure all tests pass (`yarn ci`).
-4. Create a PR.
+
+1.  Make your changes.
+2.  Add/Alter the appropriate tests.
+3.  Make sure all tests pass (`yarn ci`).
+4.  Create a PR.
