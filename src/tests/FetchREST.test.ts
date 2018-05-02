@@ -1,11 +1,11 @@
 import * as fetchMock from 'fetch-mock';
-import FetchREST from '../';
+import FetchREST, {Response} from '../';
 
 type MockRequestOptions = fetchMock.MockResponseObject;
 
 beforeEach(() => fetchMock.restore());
 
-describe('GET', () => {
+describe('get', () => {
   it('does a request to the correct endpoint and API URL', async () => {
     const requestMock = fetchMock.getOnce('*', {
       status: 200,
@@ -183,40 +183,98 @@ describe('GET', () => {
       'https://testapi.com/search?limit=20&skip=10&sort=desc',
     );
   });
+
+  it('allows a catch method to catch errors', done => {
+    const request = new FetchREST({
+      apiUrl: 'https://url/that/is/not/valid.com',
+    });
+
+    window.fetch = () =>
+      new Promise(() => {
+        throw new Error('Network request failed.');
+      });
+
+    request.get('/users').catch(error => {
+      expect(error).toBeInstanceOf(Error);
+      done();
+    });
+  });
 });
 
-describe('POST', () => {
-  it('sends a given JSON payload', async () => {
-    const requestMock = fetchMock.postOnce('*', {
+for (const method of ['post', 'put', 'patch', 'delete']) {
+  describe(method, () => {
+    it('sends a given JSON payload', async () => {
+      const mockMethodName = `${method}Once`;
+      const requestMock = (fetchMock as any)[mockMethodName]('*', {
+        status: 200,
+      });
+
+      const request = new FetchREST({
+        apiUrl: 'https://testapi.com',
+      });
+
+      const payload = {
+        userId: 214121,
+      };
+
+      await (request as any)[method]('/users', payload);
+      const {body} = requestMock.lastOptions() as MockRequestOptions;
+      expect(body).toBe(JSON.stringify(payload));
+    });
+
+    it('sends a given plain text payload', async () => {
+      const mockMethodName = `${method}Once`;
+      const requestMock = (fetchMock as any)[mockMethodName]('*', {
+        status: 200,
+      });
+
+      const request = new FetchREST({
+        apiUrl: 'https://testapi.com',
+      });
+
+      const payload = 'userid=214121&paid=true&registered=true';
+
+      await (request as any)[method]('/users', payload);
+      const {body} = requestMock.lastOptions() as MockRequestOptions;
+      expect(body).toBe(payload);
+    });
+  });
+}
+
+describe('middleware', () => {
+  it('routes all requests through the defined middleware', async () => {
+    fetchMock.postOnce('*', {
       status: 200,
     });
 
-    const request = new FetchREST({
+    const fetchRest = new FetchREST({
       apiUrl: 'https://testapi.com',
     });
 
-    const payload = {
-      userId: 214121,
-    };
+    fetchRest.middleware(request =>
+      request.then(response => ({...response, date: '14-04-2017'})),
+    );
 
-    await request.post('/users', payload);
-    const {body} = requestMock.lastOptions() as MockRequestOptions;
-    expect(body).toBe(JSON.stringify(payload));
+    const {date} = (await fetchRest.post('/users')) as Response & {
+      date: string;
+    };
+    expect(date).toBe('14-04-2017');
   });
 
-  it('sends a given plain text payload', async () => {
-    const requestMock = fetchMock.postOnce('*', {
-      status: 200,
+  it('allows for a global error handler to be set', async () => {
+    const requestErrorHandler = jest.fn();
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    const request = new FetchREST({
-      apiUrl: 'https://testapi.com',
-    });
+    window.fetch = () =>
+      new Promise(() => {
+        throw new Error('Network request failed.');
+      });
 
-    const payload = 'userid=214121&paid=true&registered=true';
+    fetchRest.middleware(request => request.catch(requestErrorHandler));
 
-    await request.post('/users', payload);
-    const {body} = requestMock.lastOptions() as MockRequestOptions;
-    expect(body).toBe(payload);
+    await fetchRest.get('/users');
+    expect(requestErrorHandler).toHaveBeenCalled();
   });
 });

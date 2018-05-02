@@ -42,11 +42,18 @@ export type GlobalRequestOptions = RequestOptions & {
   apiUrl: string;
 };
 
+export type Middleware = (response: Promise<Response>) => Promise<Response>;
+
 export default class FetchREST {
   private globalOptions: GlobalRequestOptions;
+  private requestMiddleware: Middleware;
 
   constructor(options: GlobalRequestOptions) {
     this.globalOptions = options;
+  }
+
+  middleware(middleware: Middleware) {
+    this.requestMiddleware = middleware;
   }
 
   get(endpoint: string, query: QueryObject = {}, options: RequestOptions = {}) {
@@ -102,29 +109,36 @@ export default class FetchREST {
         ? JSON.stringify(payload)
         : payload;
 
-    return fetch(`${apiUrl}${endpoint}`, fetchOptions as RequestInit).then(
-      async res => {
-        const resData: Response = {
-          success: res.ok,
-          status: res.status,
-          body: {},
-        };
+    const baseRequest = fetch(
+      `${apiUrl}${endpoint}`,
+      fetchOptions as RequestInit,
+    ).then(async res => {
+      const resData: Response = {
+        success: res.ok,
+        status: res.status,
+        body: {},
+      };
 
-        if (!res.body) {
-          return {...resData, body: null};
-        }
+      if (!res.body) {
+        return {...resData, body: null};
+      }
 
-        const textBody = await res.text();
+      const textBody = await res.text();
 
-        let jsonBody;
-        try {
-          jsonBody = JSON.parse(textBody);
-        } catch (err) {
-          throw err;
-        }
+      let jsonBody;
+      try {
+        jsonBody = JSON.parse(textBody);
+      } catch (err) {
+        throw err;
+      }
 
-        return {...resData, body: jsonBody};
-      },
-    );
+      return {...resData, body: jsonBody};
+    });
+
+    if (!this.requestMiddleware) {
+      return baseRequest;
+    }
+
+    return this.requestMiddleware(baseRequest);
   }
 }

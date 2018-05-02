@@ -5,5 +5,6 @@ export {
   Headers,
   RequestOptions,
   GlobalRequestOptions,
+  Middleware,
 } from './FetchREST';
 export {QueryObject} from './queryObjectToString';
