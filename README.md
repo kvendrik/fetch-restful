@@ -19,7 +19,7 @@ yarn add fetch-restful
 const request = new FetchREST(GlobalRequestOptions);
 ```
 
-- [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L39) - request options that will be used as the defaults for every outgoing request.
+- [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L41) - request options that will be used as the defaults for every outgoing request.
 
 ### Request methods.
 ```ts
