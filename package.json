@@ -11,7 +11,9 @@
     "lint:tslint":
       "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
     "test": "jest",
-    "ci": "yarn lint && yarn test",
+    "test:coverage":
+      "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "ci": "yarn lint && yarn test:coverage",
     "build": "tsc",
     "postinstall": "rm -rf build && yarn build"
   },
@@ -20,6 +22,7 @@
   "devDependencies": {
     "@types/fetch-mock": "^6.0.1",
     "@types/jest": "^22.2.1",
+    "coveralls": "^3.0.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-config-prettier": "^2.9.0",
@@ -37,7 +40,7 @@
     "typescript-eslint-parser": "^14.0.0"
   },
   "dependencies": {
-    "whatwg-fetch": "^2.0.4",
-    "fetch-mock": "^6.3.0"
+    "fetch-mock": "^6.3.0",
+    "whatwg-fetch": "^2.0.4"
   }
 }
