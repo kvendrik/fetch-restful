@@ -20,7 +20,7 @@ yarn add fetch-restful
 const request = new FetchREST(GlobalRequestOptions);
 ```
 
-2.  Use any of the request request methods using your newly created instance.
+2.  Use any of the request methods using your newly created instance.
 
 ```ts
 await request.get('/users', QueryObject, RequestOptions);
