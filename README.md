@@ -32,3 +32,47 @@ await request.delete('/users', Payload, RequestOptions);
 * [**`QueryObject`**](https://github.com/kvendrik/fetch-rest/blob/master/src/queryObjectToString.ts#L1) - object with query parameters to use.
 * [**`Payload`**](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L4) - your request payload.
 * [**`RequestOptions`**](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L16) - request options that will be merged with your global request options.
+
+## Examples
+
+### Basic `GET`
+
+```ts
+const request = new FetchREST({
+  apiUrl: 'https://api.github.com',
+});
+
+await request.get('/users/kvendrik');
+```
+
+### Basic `GET` with JSON headers
+
+```ts
+const request = new FetchREST({
+  apiUrl: 'https://api.github.com',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+await request.get('/users/kvendrik');
+```
+
+### Basic `GET` with JSON headers and override
+
+```ts
+const request = new FetchREST({
+  apiUrl: 'https://api.github.com',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+await request.get('/users/kvendrik', {}, {
+  headers: {
+    Authorization: 'Bearer xxx',
+  },
+});
+```
