@@ -14,14 +14,14 @@ yarn add fetch-restful
 
 ## Usage
 
-1.  Create an instance of `FetchREST` with your perferred [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L39).
-
+### Constructor
 ```ts
 const request = new FetchREST(GlobalRequestOptions);
 ```
 
-2.  Use any of the request methods using your newly created instance.
+- [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L39).
 
+### Request methods.
 ```ts
 await request.get('/users', QueryObject, RequestOptions);
 await request.post('/users', Payload, RequestOptions);
@@ -30,9 +30,17 @@ await request.put('/users', Payload, RequestOptions);
 await request.delete('/users', Payload, RequestOptions);
 ```
 
-* [**`QueryObject`**](https://github.com/kvendrik/fetch-rest/blob/master/src/queryObjectToString.ts#L1) - object with query parameters to use.
-* [**`Payload`**](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L4) - your request payload.
-* [**`RequestOptions`**](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L18) - request options that will be merged with your global request options.
+* [`QueryObject`](https://github.com/kvendrik/fetch-rest/blob/master/src/queryObjectToString.ts#L1) - object with query parameters to use.
+* [`Payload`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L4) - your request payload.
+* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L18) - request options that will be merged with your global request options.
+
+### Middleware
+Use the middleware method to define a function that will be ran every time a request goes out.
+```ts
+request.middleware(Middleware);
+```
+
+- [Middleware](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L45).
 
 ## Examples
 
@@ -80,6 +88,18 @@ await request.get(
     },
   },
 );
+```
+
+### Basic `GET` with default error handler
+
+```ts
+const request = new FetchREST({
+  apiUrl: 'https://non-existent-url/users',
+});
+
+fetchRest.middleware(request => request.catch((error) => console.log('ERROR', error)));
+
+await request.get('/users/kvendrik');
 ```
 
 ## 🏗 Contributing
