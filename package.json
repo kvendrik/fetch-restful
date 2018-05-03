@@ -1,6 +1,6 @@
 {
   "name": "fetch-restful",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A wrapper around fetch for REST API dependent projects.",
   "repository": {
     "type": "git",
@@ -12,15 +12,13 @@
     "lint": "yarn lint:ts && yarn lint:tslint && yarn lint:eslint",
     "lint:ts": "tsc --noEmit",
     "lint:eslint": "eslint src --ext .ts",
-    "lint:tslint":
-      "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
+    "lint:tslint": "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:coveralls":
-      "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "test:coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
     "ci": "yarn lint && yarn test:coveralls",
     "build": "tsc",
-    "postinstall": "rm -rf build && yarn build"
+    "prepublish": "rm -rf build && yarn build"
   },
   "author": "Koen Vendrik <k.vendrik@gmail.com>",
   "license": "MIT",
@@ -36,6 +34,7 @@
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.7.0",
     "eslint-plugin-typescript": "^0.12.0",
+    "fetch-mock": "^6.3.0",
     "jest": "^22.4.3",
     "prettier": "^1.12.1",
     "ts-jest": "^22.4.2",
@@ -45,7 +44,6 @@
     "typescript-eslint-parser": "^14.0.0"
   },
   "dependencies": {
-    "fetch-mock": "^6.3.0",
     "whatwg-fetch": "^2.0.4"
   }
 }
