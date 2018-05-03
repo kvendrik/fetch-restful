@@ -1,7 +1,7 @@
 import * as qs from 'qs';
 
 export interface QueryObject {
-  [key: string]: any;
+  [key: string]: string | number | string[] | number[];
 }
 
 export default function queryObjectToString(queryObject: QueryObject) {
