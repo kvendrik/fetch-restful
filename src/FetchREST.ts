@@ -73,14 +73,14 @@ export default class FetchREST {
     return this.request('PUT', endpoint, payload, options);
   }
 
-  delete(endpoint: string, payload: Payload, options: RequestOptions = {}) {
+  delete(endpoint: string, payload: Payload, options: RequestOptions) {
     return this.request('DELETE', endpoint, payload, options);
   }
 
   private request(
     method: RequestMethod,
     endpoint: string,
-    payload: Payload,
+    payload: Payload = null,
     options: RequestOptions = {},
   ) {
     const {globalOptions} = this;
