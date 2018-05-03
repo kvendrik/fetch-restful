@@ -115,5 +115,5 @@ await fetchRest.get('/users/kvendrik');
 
 1.  Make your changes.
 2.  Add/Alter the appropriate tests.
-3.  Make sure all tests pass (`yarn ci`).
+3.  Make sure all tests pass (`yarn lint && yarn test`).
 4.  Create a PR.
