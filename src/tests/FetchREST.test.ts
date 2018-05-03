@@ -217,6 +217,31 @@ describe('get', () => {
 
 for (const method of ['post', 'put', 'patch', 'delete']) {
   describe(method, () => {
+    it('allows for local overwrite of options', async () => {
+      const mockMethodName = `${method}Once`;
+      const requestMock = (fetchMock as any)[mockMethodName]('*', {
+        status: 200,
+      });
+
+      const request = new FetchREST({
+        apiUrl: 'https://testapi.com',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      await (request as any)[method]('/users', null, {
+        apiUrl: 'https://superapi.com',
+        headers: {
+          Accept: 'text/xml',
+        },
+      });
+
+      const {headers} = requestMock.lastOptions() as MockRequestOptions;
+      expect(headers!.Accept).toBe('text/xml');
+      expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+    });
+
     it('sends a given JSON payload', async () => {
       const mockMethodName = `${method}Once`;
       const requestMock = (fetchMock as any)[mockMethodName]('*', {
