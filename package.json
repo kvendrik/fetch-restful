@@ -2,6 +2,11 @@
   "name": "fetch-restful",
   "version": "1.0.1",
   "description": "A wrapper around fetch for REST API dependent projects.",
+  "keywords": ["fetch", "rest", "api", "request"],
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/kvendrik/fetch-restful.git"
+  },
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
