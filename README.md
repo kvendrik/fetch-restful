@@ -94,7 +94,7 @@ await request.get(
 );
 ```
 
-### Basic `GET` with global error handler
+### Basic `GET` with global error handler (resolved)
 
 ```ts
 const fetchRest = new FetchREST({
@@ -104,7 +104,7 @@ const fetchRest = new FetchREST({
 fetchRest.middleware(request =>
   request.catch(error => {
     console.log('ERROR', error);
-    throw error;
+    return {body: null, status: 0, success: false};
   }),
 );
 
