@@ -12,10 +12,12 @@
     "lint": "yarn lint:ts && yarn lint:tslint && yarn lint:eslint",
     "lint:ts": "tsc --noEmit",
     "lint:eslint": "eslint src --ext .ts",
-    "lint:tslint": "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
+    "lint:tslint":
+      "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:coveralls": "jest --coverage --coverageReporters=text-lcov | coveralls",
+    "test:coveralls":
+      "jest --coverage --coverageReporters=text-lcov | coveralls",
     "ci": "yarn lint && yarn test:coveralls",
     "build": "tsc",
     "prepublish": "rm -rf build && yarn build"
@@ -23,6 +25,7 @@
   "author": "Koen Vendrik <k.vendrik@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/qs": "^6.5.1",
     "@types/fetch-mock": "^6.0.1",
     "@types/jest": "^22.2.1",
     "coveralls": "^3.0.1",
@@ -44,7 +47,6 @@
     "typescript-eslint-parser": "^14.0.0"
   },
   "dependencies": {
-    "@types/qs": "^6.5.1",
     "qs": "^6.5.1",
     "whatwg-fetch": "^2.0.4"
   }
