@@ -94,6 +94,19 @@ await request.get(
 );
 ```
 
+### Basic `GET` with timestamp added to all responses
+```ts
+const fetchRest = new FetchREST({
+  apiUrl: 'https://api.github.com',
+});
+
+fetchRest.middleware(request =>
+  request.then(response => ({...response, timestamp: new Date().getTime()})),
+);
+
+await fetchRest.get('/users/kvendrik');
+```
+
 ### Basic `GET` with global error handler (resolved)
 
 ```ts
@@ -109,6 +122,29 @@ fetchRest.middleware(request =>
 );
 
 await fetchRest.get('/users/kvendrik');
+```
+
+### Basic `GET` with global and local error handler (unresolved)
+```ts
+const fetchRest = new FetchREST({
+  apiUrl: 'https://non-existent-url',
+});
+
+fetchRest.middleware(request =>
+  request.catch(error => {
+    console.log('ERROR (triggered first)', error);
+    throw error;
+  }),
+);
+
+fetchRest
+  .get('/users/kvendrik')
+  .then(res => {
+    console.log('RESPONSE (not triggered)', res);
+  })
+  .catch(error => {
+    console.log('ERROR_LOCAL (triggered second)', error);
+  });
 ```
 
 ## 🏗 Contributing
