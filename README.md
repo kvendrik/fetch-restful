@@ -97,15 +97,18 @@ await request.get(
 ### Basic `GET` with default error handler
 
 ```ts
-const request = new FetchREST({
+const fetchRest = new FetchREST({
   apiUrl: 'https://non-existent-url',
 });
 
 fetchRest.middleware(request =>
-  request.catch(error => console.log('ERROR', error)),
+  request.catch(error => {
+    console.log('ERROR', error);
+    return {body: null, status: 0, success: false};
+  }),
 );
 
-await request.get('/users/kvendrik');
+await fetchRest.get('/users/kvendrik');
 ```
 
 ## 🏗 Contributing
