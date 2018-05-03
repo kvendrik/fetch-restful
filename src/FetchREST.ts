@@ -56,32 +56,44 @@ export default class FetchREST {
     this.requestMiddleware = middleware;
   }
 
-  get(endpoint: string, query: QueryObject = {}, options: RequestOptions) {
+  get(endpoint: string, query: QueryObject = {}, options: RequestOptions = {}) {
     const queryString = queryObjectToString(query);
     return this.request('GET', `${endpoint}${queryString}`, null, options);
   }
 
-  post(endpoint: string, payload: Payload, options: RequestOptions) {
+  post(
+    endpoint: string,
+    payload: Payload = null,
+    options: RequestOptions = {},
+  ) {
     return this.request('POST', endpoint, payload, options);
   }
 
-  patch(endpoint: string, payload: Payload, options: RequestOptions) {
+  patch(
+    endpoint: string,
+    payload: Payload = null,
+    options: RequestOptions = {},
+  ) {
     return this.request('PATCH', endpoint, payload, options);
   }
 
-  put(endpoint: string, payload: Payload, options: RequestOptions) {
+  put(endpoint: string, payload: Payload = null, options: RequestOptions = {}) {
     return this.request('PUT', endpoint, payload, options);
   }
 
-  delete(endpoint: string, payload: Payload, options: RequestOptions) {
+  delete(
+    endpoint: string,
+    payload: Payload = null,
+    options: RequestOptions = {},
+  ) {
     return this.request('DELETE', endpoint, payload, options);
   }
 
   private request(
     method: RequestMethod,
     endpoint: string,
-    payload: Payload = null,
-    options: RequestOptions = {},
+    payload: Payload,
+    options: RequestOptions,
   ) {
     const {globalOptions} = this;
     const fetchOptions = {

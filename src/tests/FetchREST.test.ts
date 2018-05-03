@@ -242,6 +242,22 @@ for (const method of ['post', 'put', 'patch', 'delete']) {
       expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
     });
 
+    it('allows a request without a payload', async () => {
+      const mockMethodName = `${method}Once`;
+      const requestMock = (fetchMock as any)[mockMethodName]('*', {
+        status: 200,
+      });
+
+      const request = new FetchREST({
+        apiUrl: 'https://testapi.com',
+      });
+
+      await (request as any)[method]('/users');
+
+      const {body} = requestMock.lastOptions() as MockRequestOptions;
+      expect(body).toBeNull();
+    });
+
     it('sends a given JSON payload', async () => {
       const mockMethodName = `${method}Once`;
       const requestMock = (fetchMock as any)[mockMethodName]('*', {
