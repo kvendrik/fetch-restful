@@ -1,18 +1,15 @@
+import * as qs from 'qs';
+
 export interface QueryObject {
-  [key: string]: string | number;
+  [key: string]: any;
 }
 
 export default function queryObjectToString(queryObject: QueryObject) {
-  const keys = Object.keys(queryObject);
+  const queryString = qs.stringify(queryObject);
 
-  if (keys.length < 1) {
+  if (queryString.length < 1) {
     return '';
   }
 
-  const queryParts = Object.keys(queryObject).map(key => {
-    const value = queryObject[key];
-    return `${key}=${value}`;
-  });
-
-  return `?${queryParts.join('&')}`;
+  return `?${queryString}`;
 }

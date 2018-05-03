@@ -44,6 +44,8 @@
     "typescript-eslint-parser": "^14.0.0"
   },
   "dependencies": {
+    "@types/qs": "^6.5.1",
+    "qs": "^6.5.1",
     "whatwg-fetch": "^2.0.4"
   }
 }
