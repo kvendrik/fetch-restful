@@ -17,24 +17,28 @@ yarn add fetch-restful
 ### Constructor
 
 ```ts
-const request = new FetchREST(GlobalRequestOptions);
+const request = new FetchREST(
+  GlobalRequestOptions | GlobalRequestOptionsGetter,
+);
 ```
 
-* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L27) - request options that will be used as the defaults for every outgoing request.
+* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L21) - request options that will be used as the defaults for every outgoing request.
+* [`GlobalRequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L24) - a method that returns a `GlobalRequestOptions` object.
 
 ### Request methods.
 
 ```ts
-await request.get('/users', QueryObject, RequestOptions);
-await request.post('/users', Payload, RequestOptions);
-await request.patch('/users', Payload, RequestOptions);
-await request.put('/users', Payload, RequestOptions);
-await request.delete('/users', Payload, RequestOptions);
+await request.get('/users', QueryObject, RequestOptions | RequestOptionsGetter);
+await request.post('/users', Payload, RequestOptions | RequestOptionsGetter);
+await request.patch('/users', Payload, RequestOptions | RequestOptionsGetter);
+await request.put('/users', Payload, RequestOptions | RequestOptionsGetter);
+await request.delete('/users', Payload, RequestOptions | RequestOptionsGetter);
 ```
 
 * [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
 * [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L4) - your request payload.
-* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L20) - request options that will be merged with your global request options.
+* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L14) - request options that will be merged with your global request options.
+* [`RequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L19) - a method that returns a `RequestOptions` object.
 
 ### Middleware
 
@@ -44,7 +48,7 @@ Use the middleware method to define a function that will be added to the promise
 request.middleware(Middleware);
 ```
 
-* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L32) - method that will be added to the promise chain.
+* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L26) - method that will be added to the promise chain.
 
 ## Examples
 
