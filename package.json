@@ -11,7 +11,7 @@
   "types": "build/index.d.ts",
   "scripts": {
     "lint": "yarn lint:ts && yarn lint:tslint && yarn lint:eslint",
-    "lint:ts": "tsc --noEmit",
+    "lint:ts": "tsc --noEmit --pretty",
     "lint:eslint": "eslint src --ext .ts",
     "lint:tslint":
       "tslint -c tslint.json --project tsconfig.json 'src/**/*.ts'",
