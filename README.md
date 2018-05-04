@@ -20,7 +20,7 @@ yarn add fetch-restful
 const request = new FetchREST(GlobalRequestOptions);
 ```
 
-* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L41) - request options that will be used as the defaults for every outgoing request.
+* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L27) - request options that will be used as the defaults for every outgoing request.
 
 ### Request methods.
 
@@ -32,9 +32,9 @@ await request.put('/users', Payload, RequestOptions);
 await request.delete('/users', Payload, RequestOptions);
 ```
 
-* [`QueryObject`](https://github.com/kvendrik/fetch-rest/blob/master/src/queryObjectToString.ts#L1) - object with query parameters to use.
-* [`Payload`](https://github.com/kvendrik/fetch-rest/blob/master/src/FetchREST.ts#L4) - your request payload.
-* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L18) - request options that will be merged with your global request options.
+* [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
+* [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L4) - your request payload.
+* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L20) - request options that will be merged with your global request options.
 
 ### Middleware
 
@@ -44,7 +44,7 @@ Use the middleware method to define a function that will be added to the promise
 request.middleware(Middleware);
 ```
 
-* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L45) - method that will be added to the promise chain.
+* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L32) - method that will be added to the promise chain.
 
 ## Examples
 
