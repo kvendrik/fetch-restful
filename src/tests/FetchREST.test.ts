@@ -332,4 +332,26 @@ describe('middleware', () => {
     await fetchRest.get('/users');
     expect(requestErrorHandler).toHaveBeenCalled();
   });
+
+  it('allows for a combination of both a global and a local error handler', async () => {
+    const requestErrorHandler = jest.fn();
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://url/that/is/not/valid.com',
+    });
+
+    window.fetch = () =>
+      new Promise(() => {
+        throw new Error('Network request failed.');
+      });
+
+    fetchRest.middleware(request =>
+      request.catch(error => {
+        requestErrorHandler();
+        throw error;
+      }),
+    );
+
+    await fetchRest.get('/users/kvendrik').catch(requestErrorHandler);
+    expect(requestErrorHandler.mock.calls.length).toBe(2);
+  });
 });
