@@ -292,6 +292,30 @@ describe('post', () => {
     expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
   });
 
+  it('allows for local overwrite of options using options getter', async () => {
+    const requestMock = fetchMock.postOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.post('/users', null, () => ({
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    }));
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
   it('allows a request without a payload', async () => {
     const requestMock = fetchMock.postOnce('*', {
       status: 200,
@@ -383,6 +407,30 @@ describe('put', () => {
         Accept: 'text/xml',
       },
     });
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
+  it('allows for local overwrite of options using options getter', async () => {
+    const requestMock = fetchMock.putOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.put('/users', null, () => ({
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    }));
 
     const {headers} = requestMock.lastOptions() as MockRequestOptions;
     expect(headers!.Accept).toBe('text/xml');
@@ -486,6 +534,30 @@ describe('patch', () => {
     expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
   });
 
+  it('allows for local overwrite of options using options getter', async () => {
+    const requestMock = fetchMock.patchOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.patch('/users', null, () => ({
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    }));
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
   it('allows a request without a payload', async () => {
     const requestMock = fetchMock.patchOnce('*', {
       status: 200,
@@ -577,6 +649,30 @@ describe('delete', () => {
         Accept: 'text/xml',
       },
     });
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
+  it('allows for local overwrite of options using options getter', async () => {
+    const requestMock = fetchMock.deleteOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.delete('/users', null, () => ({
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    }));
 
     const {headers} = requestMock.lastOptions() as MockRequestOptions;
     expect(headers!.Accept).toBe('text/xml');

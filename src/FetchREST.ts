@@ -62,7 +62,11 @@ export default class FetchREST {
     return this.request('PATCH', endpoint, payload, options);
   }
 
-  put(endpoint: string, payload: Payload = null, options: RequestOptions = {}) {
+  put(
+    endpoint: string,
+    payload: Payload = null,
+    options: RequestOptions | RequestOptionsGetter = {},
+  ) {
     return this.request('PUT', endpoint, payload, options);
   }
 
