@@ -6,6 +6,7 @@
     "type": "git",
     "url": "https://github.com/kvendrik/fetch-restful.git"
   },
+  "keywords": ["fetch", "rest", "api", "request"],
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
