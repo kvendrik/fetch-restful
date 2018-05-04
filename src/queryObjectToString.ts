@@ -1,8 +1,6 @@
 import * as qs from 'qs';
 
-export interface QueryObject {
-  [key: string]: string | number | string[] | number[];
-}
+export type QueryObject = any;
 
 export default function queryObjectToString(queryObject: QueryObject) {
   const queryString = qs.stringify(queryObject);

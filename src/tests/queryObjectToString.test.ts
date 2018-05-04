@@ -27,4 +27,23 @@ describe('queryObjectToString', () => {
       ),
     );
   });
+
+  it('allows for nested query parameters', () => {
+    const queryString = queryObjectToString({
+      exclude: {
+        id: 2166271,
+      },
+      include: {
+        users: {
+          ids: [216172, 216787],
+          language: 'en-US',
+        },
+      },
+    });
+    expect(queryString).toBe(
+      encodeURI(
+        '?exclude[id]=2166271&include[users][ids][0]=216172&include[users][ids][1]=216787&include[users][language]=en-US',
+      ),
+    );
+  });
 });
