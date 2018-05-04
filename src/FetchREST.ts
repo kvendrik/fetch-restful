@@ -1,7 +1,7 @@
 import 'whatwg-fetch';
 import queryObjectToString, {QueryObject} from './queryObjectToString';
 
-export type Payload = object | string | null;
+export type Payload = RequestInit['body'];
 
 export interface Response {
   success: boolean;
@@ -13,6 +13,8 @@ type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
 export type RequestOptions = RequestInit & {
   apiUrl?: string;
+  body?: undefined;
+  method?: undefined;
 };
 
 export type GlobalRequestOptions = RequestOptions & {
