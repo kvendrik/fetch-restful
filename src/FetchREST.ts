@@ -96,31 +96,30 @@ export default class FetchREST {
         ? JSON.stringify(payload)
         : payload;
 
-    const baseRequest = fetch(
-      `${apiUrl}${endpoint}`,
-      fetchOptions as RequestInit,
-    ).then(async res => {
-      const resData: Response = {
-        success: res.ok,
-        status: res.status,
-        body: {},
-      };
+    const baseRequest = fetch(`${apiUrl}${endpoint}`, fetchOptions).then(
+      async res => {
+        const resData: Response = {
+          success: res.ok,
+          status: res.status,
+          body: {},
+        };
 
-      if (!res.body) {
-        return {...resData, body: null};
-      }
+        if (!res.body) {
+          return {...resData, body: null};
+        }
 
-      const textBody = await res.text();
+        const textBody = await res.text();
 
-      let finalBody;
-      try {
-        finalBody = JSON.parse(textBody);
-      } catch (error) {
-        finalBody = textBody;
-      }
+        let finalBody;
+        try {
+          finalBody = JSON.parse(textBody);
+        } catch (error) {
+          finalBody = textBody;
+        }
 
-      return {...resData, body: finalBody};
-    });
+        return {...resData, body: finalBody};
+      },
+    );
 
     if (!this.requestMiddleware) {
       return baseRequest;
