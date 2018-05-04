@@ -58,6 +58,33 @@ const request = new FetchREST({
 await request.get('/users/kvendrik');
 ```
 
+### Basic `GET` with options getter
+
+```ts
+const fetchRest = new FetchREST(() => ({
+  apiUrl: 'https://yourapi.com',
+  headers: {
+    'X-Timestamp': new Date().getTime(),
+  },
+}));
+
+await fetchRest.get('/users/kvendrik');
+```
+
+### Basic `GET` with query
+
+```ts
+const fetchRest = new FetchREST({
+  apiUrl: 'https://api.github.com',
+});
+
+await fetchRest.get('/users', {
+  limit: 20,
+  skip: 10,
+  userIds: ['23181', '72819', '21819'],
+});
+```
+
 ### Basic `GET` with JSON headers
 
 ```ts
@@ -92,6 +119,24 @@ await request.get(
     },
   },
 );
+```
+
+### Basic `GET` with JSON headers and override using options getter
+
+```ts
+const request = new FetchREST({
+  apiUrl: 'https://api.github.com',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+await request.get('/users/kvendrik', {}, () => ({
+  headers: {
+    Authorization: 'Bearer xxx',
+  },
+}));
 ```
 
 ### Basic `GET` with timestamp added to all responses

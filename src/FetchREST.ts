@@ -11,15 +11,23 @@ export interface Response {
 
 type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
-export type RequestOptions = RequestInit & {
+export type RequestOptionsLiteral = RequestInit & {
   apiUrl?: string;
   body?: undefined;
   method?: undefined;
 };
 
-export type GlobalRequestOptions = RequestOptions & {
+export type RequestOptions = RequestOptionsLiteral | RequestOptionsGetter;
+export type RequestOptionsGetter = () => RequestOptionsLiteral;
+
+export type GlobalRequestOptionsLiteral = RequestOptionsLiteral & {
   apiUrl: string;
 };
+
+export type GlobalRequestOptions =
+  | GlobalRequestOptionsLiteral
+  | GlobalRequestOptionsGetter;
+export type GlobalRequestOptionsGetter = () => GlobalRequestOptionsLiteral;
 
 export type Middleware = (response: Promise<Response>) => Promise<Response>;
 
@@ -72,9 +80,13 @@ export default class FetchREST {
     method: RequestMethod,
     endpoint: string,
     payload: Payload,
-    options: RequestOptions,
+    givenOptions: RequestOptions,
   ) {
-    const {globalOptions} = this;
+    const {globalOptions: givenGlobalOptions} = this;
+
+    const globalOptions = getOptionsFromOptionsGetter(givenGlobalOptions);
+    const options = getOptionsFromOptionsGetter(givenOptions);
+
     const fetchOptions = {
       ...(globalOptions as RequestInit),
       ...options,
@@ -127,4 +139,13 @@ export default class FetchREST {
 
     return this.requestMiddleware(baseRequest);
   }
+}
+
+function getOptionsFromOptionsGetter(
+  options: RequestOptions | GlobalRequestOptions,
+) {
+  if (typeof options === 'function') {
+    return options();
+  }
+  return options;
 }

@@ -3,6 +3,10 @@ import FetchREST, {Response} from '../';
 
 type MockRequestOptions = fetchMock.MockResponseObject;
 
+interface MockLocalStorage {
+  [key: string]: string;
+}
+
 beforeEach(() => fetchMock.restore());
 
 describe('get', () => {
@@ -17,6 +21,54 @@ describe('get', () => {
 
     await request.get('/users');
     expect(requestMock.lastUrl()).toBe('https://testapi.com/users');
+  });
+
+  it('allows method instead of object literal as global request options', async () => {
+    const mockLocalStorage: MockLocalStorage = {};
+    const requestMock = fetchMock.get('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST(() => ({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Authorization: mockLocalStorage.authToken,
+      },
+    }));
+
+    await request.get('/users');
+    const beforeOptions = requestMock.lastOptions() as MockRequestOptions;
+    expect(beforeOptions.headers!.Authorization).toBeUndefined();
+
+    mockLocalStorage.authToken = 'Bearer sahas2164sagafsg1245sfsax';
+
+    await request.get('/users');
+
+    const afterOptions = requestMock.lastOptions() as MockRequestOptions;
+    expect(afterOptions.headers!.Authorization).toBe(
+      'Bearer sahas2164sagafsg1245sfsax',
+    );
+  });
+
+  it('allows method instead of object literal as local request options', async () => {
+    const requestMock = fetchMock.getOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST(() => ({
+      apiUrl: 'https://testapi.com',
+    }));
+
+    await request.get('/users', {}, () => ({
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }));
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers).toEqual({
+      'Content-Type': 'application/json',
+    });
   });
 
   it('sends the defined headers', async () => {
