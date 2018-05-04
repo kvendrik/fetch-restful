@@ -1,4 +1,4 @@
-# [WIP] FetchREST(ful)
+# FetchREST(ful)
 
 [![CircleCI](https://circleci.com/gh/kvendrik/fetch-restful.svg?style=svg)](https://circleci.com/gh/kvendrik/fetch-restful)
 [![Coverage Status](https://coveralls.io/repos/github/kvendrik/fetch-restful/badge.svg?branch=master&q=261781)](https://coveralls.io/github/kvendrik/fetch-restful?branch=master&q=261781)
@@ -95,6 +95,7 @@ await request.get(
 ```
 
 ### Basic `GET` with timestamp added to all responses
+
 ```ts
 const fetchRest = new FetchREST({
   apiUrl: 'https://api.github.com',
@@ -125,6 +126,7 @@ await fetchRest.get('/users/kvendrik');
 ```
 
 ### Basic `GET` with global and local error handler (unresolved)
+
 ```ts
 const fetchRest = new FetchREST({
   apiUrl: 'https://non-existent-url',
