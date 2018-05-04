@@ -215,110 +215,393 @@ describe('get', () => {
   });
 });
 
-for (const method of ['post', 'put', 'patch', 'delete']) {
-  describe(method, () => {
-    it('allows for local overwrite of options', async () => {
-      const mockMethodName = `${method}Once`;
-      const requestMock = (fetchMock as any)[mockMethodName]('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-        headers: {
-          Accept: 'application/json',
-        },
-      });
-
-      await (request as any)[method]('/users', null, {
-        apiUrl: 'https://superapi.com',
-        headers: {
-          Accept: 'text/xml',
-        },
-      });
-
-      const {headers} = requestMock.lastOptions() as MockRequestOptions;
-      expect(headers!.Accept).toBe('text/xml');
-      expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+describe('post', () => {
+  it('allows for local overwrite of options', async () => {
+    const requestMock = fetchMock.postOnce('*', {
+      status: 200,
     });
 
-    it('allows a request without a payload', async () => {
-      const mockMethodName = `${method}Once`;
-      const requestMock = (fetchMock as any)[mockMethodName]('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      await (request as any)[method]('/users');
-
-      const {body} = requestMock.lastOptions() as MockRequestOptions;
-      expect(body).toBeNull();
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
     });
 
-    it('sends a given object payload', async () => {
-      const mockMethodName = `${method}Once`;
-      const requestMock = (fetchMock as any)[mockMethodName]('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const payload = {
-        userId: 214121,
-      };
-
-      await (request as any)[method]('/users', payload);
-      const {body} = requestMock.lastOptions() as MockRequestOptions;
-      expect(body).toBe(JSON.stringify(payload));
+    await request.post('/users', null, {
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
     });
 
-    it('sends a given array payload', async () => {
-      const mockMethodName = `${method}Once`;
-      const requestMock = (fetchMock as any)[mockMethodName]('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const payload = [
-        {
-          userId: 214121,
-        },
-        {
-          userId: 815642,
-        },
-      ];
-
-      await (request as any)[method]('/users', payload);
-      const {body} = requestMock.lastOptions() as MockRequestOptions;
-      expect(body).toBe(JSON.stringify(payload));
-    });
-
-    it('sends a given plain text payload', async () => {
-      const mockMethodName = `${method}Once`;
-      const requestMock = (fetchMock as any)[mockMethodName]('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const payload = 'userid=214121&paid=true&registered=true';
-
-      await (request as any)[method]('/users', payload);
-      const {body} = requestMock.lastOptions() as MockRequestOptions;
-      expect(body).toBe(payload);
-    });
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
   });
-}
+
+  it('allows a request without a payload', async () => {
+    const requestMock = fetchMock.postOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    await request.post('/users');
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBeNull();
+  });
+
+  it('sends a given object payload', async () => {
+    const requestMock = fetchMock.postOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = {
+      userId: 214121,
+    };
+
+    await request.post('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given array payload', async () => {
+    const requestMock = fetchMock.postOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = [
+      {
+        userId: 214121,
+      },
+      {
+        userId: 815642,
+      },
+    ];
+
+    await request.post('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given plain text payload', async () => {
+    const requestMock = fetchMock.postOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = 'userid=214121&paid=true&registered=true';
+
+    await request.post('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(payload);
+  });
+});
+
+describe('put', () => {
+  it('allows for local overwrite of options', async () => {
+    const requestMock = fetchMock.putOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.put('/users', null, {
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    });
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
+  it('allows a request without a payload', async () => {
+    const requestMock = fetchMock.putOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    await request.put('/users');
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBeNull();
+  });
+
+  it('sends a given object payload', async () => {
+    const requestMock = fetchMock.putOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = {
+      userId: 214121,
+    };
+
+    await request.put('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given array payload', async () => {
+    const requestMock = fetchMock.putOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = [
+      {
+        userId: 214121,
+      },
+      {
+        userId: 815642,
+      },
+    ];
+
+    await request.put('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given plain text payload', async () => {
+    const requestMock = fetchMock.putOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = 'userid=214121&paid=true&registered=true';
+
+    await request.put('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(payload);
+  });
+});
+
+describe('patch', () => {
+  it('allows for local overwrite of options', async () => {
+    const requestMock = fetchMock.patchOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.patch('/users', null, {
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    });
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
+  it('allows a request without a payload', async () => {
+    const requestMock = fetchMock.patchOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    await request.patch('/users');
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBeNull();
+  });
+
+  it('sends a given object payload', async () => {
+    const requestMock = fetchMock.patchOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = {
+      userId: 214121,
+    };
+
+    await request.patch('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given array payload', async () => {
+    const requestMock = fetchMock.patchOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = [
+      {
+        userId: 214121,
+      },
+      {
+        userId: 815642,
+      },
+    ];
+
+    await request.patch('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given plain text payload', async () => {
+    const requestMock = fetchMock.patchOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = 'userid=214121&paid=true&registered=true';
+
+    await request.patch('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(payload);
+  });
+});
+
+describe('delete', () => {
+  it('allows for local overwrite of options', async () => {
+    const requestMock = fetchMock.deleteOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    await request.delete('/users', null, {
+      apiUrl: 'https://superapi.com',
+      headers: {
+        Accept: 'text/xml',
+      },
+    });
+
+    const {headers} = requestMock.lastOptions() as MockRequestOptions;
+    expect(headers!.Accept).toBe('text/xml');
+    expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+  });
+
+  it('allows a request without a payload', async () => {
+    const requestMock = fetchMock.deleteOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    await request.delete('/users');
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBeNull();
+  });
+
+  it('sends a given object payload', async () => {
+    const requestMock = fetchMock.deleteOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = {
+      userId: 214121,
+    };
+
+    await request.delete('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given array payload', async () => {
+    const requestMock = fetchMock.deleteOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = [
+      {
+        userId: 214121,
+      },
+      {
+        userId: 815642,
+      },
+    ];
+
+    await request.delete('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(JSON.stringify(payload));
+  });
+
+  it('sends a given plain text payload', async () => {
+    const requestMock = fetchMock.deleteOnce('*', {
+      status: 200,
+    });
+
+    const request = new FetchREST({
+      apiUrl: 'https://testapi.com',
+    });
+
+    const payload = 'userid=214121&paid=true&registered=true';
+
+    await request.delete('/users', payload);
+    const {body} = requestMock.lastOptions() as MockRequestOptions;
+    expect(body).toBe(payload);
+  });
+});
 
 describe('middleware', () => {
   it('routes all requests through the defined middleware', async () => {
