@@ -329,8 +329,9 @@ describe('middleware', () => {
 
     fetchRest.middleware(request => request.catch(requestErrorHandler));
 
-    await fetchRest.get('/users');
-    expect(requestErrorHandler).toHaveBeenCalled();
+    const response = await fetchRest.get('/users').catch(requestErrorHandler);
+    expect(requestErrorHandler.mock.calls.length).toBe(1);
+    expect(response).toBeUndefined();
   });
 
   it('allows for a combination of both a global and a local error handler', async () => {
@@ -353,5 +354,23 @@ describe('middleware', () => {
 
     await fetchRest.get('/users/kvendrik').catch(requestErrorHandler);
     expect(requestErrorHandler.mock.calls.length).toBe(2);
+  });
+
+  it('allows for a global error handler to resolve errors', async () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://url/that/is/not/valid.com',
+    });
+
+    window.fetch = () =>
+      new Promise(() => {
+        throw new Error('Network request failed.');
+      });
+
+    fetchRest.middleware(request =>
+      request.catch(() => ({body: null, status: 0, success: false})),
+    );
+
+    const response = await fetchRest.get('/users/kvendrik');
+    expect(response).toEqual({body: null, status: 0, success: false});
   });
 });
