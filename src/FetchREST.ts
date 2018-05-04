@@ -11,31 +11,25 @@ export interface Response {
 
 type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
-export type RequestOptionsLiteral = RequestInit & {
+export type RequestOptions = RequestInit & {
   apiUrl?: string;
   body?: undefined;
   method?: undefined;
 };
+export type RequestOptionsGetter = () => RequestOptions;
 
-export type RequestOptions = RequestOptionsLiteral | RequestOptionsGetter;
-export type RequestOptionsGetter = () => RequestOptionsLiteral;
-
-export type GlobalRequestOptionsLiteral = RequestOptionsLiteral & {
+export type GlobalRequestOptions = RequestOptions & {
   apiUrl: string;
 };
-
-export type GlobalRequestOptions =
-  | GlobalRequestOptionsLiteral
-  | GlobalRequestOptionsGetter;
-export type GlobalRequestOptionsGetter = () => GlobalRequestOptionsLiteral;
+export type GlobalRequestOptionsGetter = () => GlobalRequestOptions;
 
 export type Middleware = (response: Promise<Response>) => Promise<Response>;
 
 export default class FetchREST {
-  private globalOptions: GlobalRequestOptions;
+  private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
   private requestMiddleware: Middleware;
 
-  constructor(options: GlobalRequestOptions) {
+  constructor(options: GlobalRequestOptions | GlobalRequestOptionsGetter) {
     this.globalOptions = options;
   }
 
@@ -43,7 +37,11 @@ export default class FetchREST {
     this.requestMiddleware = middleware;
   }
 
-  get(endpoint: string, query: QueryObject = {}, options: RequestOptions = {}) {
+  get(
+    endpoint: string,
+    query: QueryObject = {},
+    options: RequestOptions | RequestOptionsGetter = {},
+  ) {
     const queryString = queryObjectToString(query);
     return this.request('GET', `${endpoint}${queryString}`, null, options);
   }
@@ -51,7 +49,7 @@ export default class FetchREST {
   post(
     endpoint: string,
     payload: Payload = null,
-    options: RequestOptions = {},
+    options: RequestOptions | RequestOptionsGetter = {},
   ) {
     return this.request('POST', endpoint, payload, options);
   }
@@ -59,7 +57,7 @@ export default class FetchREST {
   patch(
     endpoint: string,
     payload: Payload = null,
-    options: RequestOptions = {},
+    options: RequestOptions | RequestOptionsGetter = {},
   ) {
     return this.request('PATCH', endpoint, payload, options);
   }
@@ -71,7 +69,7 @@ export default class FetchREST {
   delete(
     endpoint: string,
     payload: Payload = null,
-    options: RequestOptions = {},
+    options: RequestOptions | RequestOptionsGetter = {},
   ) {
     return this.request('DELETE', endpoint, payload, options);
   }
@@ -80,7 +78,7 @@ export default class FetchREST {
     method: RequestMethod,
     endpoint: string,
     payload: Payload,
-    givenOptions: RequestOptions,
+    givenOptions: RequestOptions | RequestOptionsGetter,
   ) {
     const {globalOptions: givenGlobalOptions} = this;
 
@@ -142,7 +140,7 @@ export default class FetchREST {
 }
 
 function getOptionsFromOptionsGetter(
-  options: RequestOptions | GlobalRequestOptions,
+  options: RequestOptions | RequestOptionsGetter,
 ) {
   if (typeof options === 'function') {
     return options();
