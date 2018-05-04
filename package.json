@@ -1,6 +1,6 @@
 {
   "name": "fetch-restful",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A wrapper around fetch for REST API dependent projects.",
   "repository": {
     "type": "git",
