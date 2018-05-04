@@ -21,7 +21,8 @@
       "jest --coverage --coverageReporters=text-lcov | coveralls",
     "ci": "yarn lint && yarn test:coveralls",
     "build": "tsc",
-    "prepublish": "rm -rf build && yarn build"
+    "clean": "rm -rf build",
+    "prepublish": "yarn clean && yarn build"
   },
   "author": "Koen Vendrik <k.vendrik@gmail.com>",
   "license": "MIT",
