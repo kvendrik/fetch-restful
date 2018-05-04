@@ -1,7 +1,7 @@
 import 'whatwg-fetch';
 import queryObjectToString, {QueryObject} from './queryObjectToString';
 
-export type Payload = RequestInit['body'];
+export type Payload = RequestInit['body'] | object;
 
 export interface Response {
   success: boolean;

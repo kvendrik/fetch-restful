@@ -258,7 +258,7 @@ for (const method of ['post', 'put', 'patch', 'delete']) {
       expect(body).toBeNull();
     });
 
-    it('sends a given JSON payload', async () => {
+    it('sends a given object payload', async () => {
       const mockMethodName = `${method}Once`;
       const requestMock = (fetchMock as any)[mockMethodName]('*', {
         status: 200,
@@ -271,6 +271,30 @@ for (const method of ['post', 'put', 'patch', 'delete']) {
       const payload = {
         userId: 214121,
       };
+
+      await (request as any)[method]('/users', payload);
+      const {body} = requestMock.lastOptions() as MockRequestOptions;
+      expect(body).toBe(JSON.stringify(payload));
+    });
+
+    it('sends a given array payload', async () => {
+      const mockMethodName = `${method}Once`;
+      const requestMock = (fetchMock as any)[mockMethodName]('*', {
+        status: 200,
+      });
+
+      const request = new FetchREST({
+        apiUrl: 'https://testapi.com',
+      });
+
+      const payload = [
+        {
+          userId: 214121,
+        },
+        {
+          userId: 815642,
+        },
+      ];
 
       await (request as any)[method]('/users', payload);
       const {body} = requestMock.lastOptions() as MockRequestOptions;
