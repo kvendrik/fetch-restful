@@ -2,7 +2,6 @@ export {
   default,
   Payload,
   Response,
-  Headers,
   RequestOptions,
   GlobalRequestOptions,
   Middleware,
