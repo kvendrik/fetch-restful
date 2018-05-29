@@ -829,3 +829,30 @@ describe('middleware', () => {
     expect(response).toEqual({body: null, status: 0, success: false});
   });
 });
+
+describe('getAbortToken', () => {
+  it('returns an unique token', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+    const token = fetchRest.getAbortToken();
+    expect(typeof token).toBe('string');
+  });
+});
+
+describe('abort', () => {
+  it('allows for cancellation of the request', () => {
+    const requestErrorHandler = jest.fn();
+    fetchMock.getOnce('*', {
+      status: 200,
+    });
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    const abortToken = fetchRest.getAbortToken();
+    fetchRest.get('/users', {}, {abortToken}).catch(requestErrorHandler);
+    fetchRest.abort(abortToken);
+    expect(requestErrorHandler).toBeCalled();
+  });
+});

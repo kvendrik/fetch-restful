@@ -13,6 +13,7 @@ type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
 export type RequestOptions = RequestInit & {
   apiUrl?: string;
+  abortToken?: string;
   body?: undefined;
   method?: undefined;
 };
@@ -28,6 +29,9 @@ export type Middleware = (response: Promise<Response>) => Promise<Response>;
 export default class FetchREST {
   private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
   private requestMiddleware: Middleware;
+  private abortControllers: {
+    [key: string]: AbortController;
+  } = {};
 
   constructor(options: GlobalRequestOptions | GlobalRequestOptionsGetter) {
     this.globalOptions = options;
@@ -78,6 +82,25 @@ export default class FetchREST {
     return this.request('DELETE', endpoint, payload, options);
   }
 
+  abort(token: string) {
+    const controller = this.abortControllers[token];
+    if (!controller) {
+      return;
+    }
+    delete this.abortControllers[token];
+    controller.abort();
+  }
+
+  getAbortToken() {
+    let token = '';
+    while (token === '' || this.abortControllers[token]) {
+      token = Math.random()
+        .toString(36)
+        .substring(2, 15);
+    }
+    return token;
+  }
+
   private request(
     method: RequestMethod,
     endpoint: string,
@@ -109,6 +132,13 @@ export default class FetchREST {
       payload !== null && typeof payload === 'object'
         ? JSON.stringify(payload)
         : payload;
+
+    if (fetchOptions.abortToken) {
+      const controller = new AbortController();
+      fetchOptions.signal = controller.signal;
+      this.abortControllers[fetchOptions.abortToken] = controller;
+      delete fetchOptions.abortToken;
+    }
 
     const baseRequest = fetch(`${apiUrl}${endpoint}`, fetchOptions).then(
       async res => {
