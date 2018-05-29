@@ -19,7 +19,7 @@
     "test:coverage": "jest --coverage",
     "test:coveralls":
       "jest --coverage --coverageReporters=text-lcov | coveralls",
-    "ci": "yarn lint && yarn test:coveralls",
+    "ci": "yarn lint && yarn test:coveralls && yarn test",
     "build": "tsc",
     "clean": "rm -rf build",
     "prepublish": "yarn clean && yarn build"
