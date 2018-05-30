@@ -842,7 +842,6 @@ describe('getAbortToken', () => {
 
 describe('abort', () => {
   it('allows for cancellation of the request', () => {
-    const abortHandler = jest.fn();
     fetchMock.getOnce('*', {
       status: 200,
     });
@@ -850,11 +849,12 @@ describe('abort', () => {
       apiUrl: 'https://api.github.com',
     });
 
+    const abortHandler = jest.fn();
     class AbortController {
       readonly signal = 'xxx';
-      private abort: () => void;
-      constructor() {
-        this.abort = abortHandler;
+      // eslint-disable-next-line class-methods-use-this
+      abort(...args: any[]) {
+        abortHandler(...args);
       }
     }
     (window as any).AbortController = AbortController;

@@ -21,6 +21,7 @@ export type RequestOptionsGetter = () => RequestOptions;
 
 export type GlobalRequestOptions = RequestOptions & {
   apiUrl: string;
+  abortToken?: undefined;
 };
 export type GlobalRequestOptionsGetter = () => GlobalRequestOptions;
 
