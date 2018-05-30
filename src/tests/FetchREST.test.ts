@@ -842,7 +842,7 @@ describe('getAbortToken', () => {
 
 describe('abort', () => {
   it('allows for cancellation of the request', () => {
-    const requestErrorHandler = jest.fn();
+    const abortHandler = jest.fn();
     fetchMock.getOnce('*', {
       status: 200,
     });
@@ -850,9 +850,30 @@ describe('abort', () => {
       apiUrl: 'https://api.github.com',
     });
 
+    class AbortController {
+      readonly signal = 'xxx';
+      private abort: () => void;
+      constructor() {
+        this.abort = abortHandler;
+      }
+    }
+    (window as any).AbortController = AbortController;
+
     const abortToken = fetchRest.getAbortToken();
-    fetchRest.get('/users', {}, {abortToken}).catch(requestErrorHandler);
+    fetchRest.get('/users', {}, {abortToken});
     fetchRest.abort(abortToken);
-    expect(requestErrorHandler).toBeCalled();
+    expect(abortHandler).toBeCalled();
+  });
+
+  it('calling abort with an invalid token throws an error', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    try {
+      fetchRest.abort('xxx');
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+    }
   });
 });

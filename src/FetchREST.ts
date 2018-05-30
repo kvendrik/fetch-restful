@@ -85,7 +85,7 @@ export default class FetchREST {
   abort(token: string) {
     const controller = this.abortControllers[token];
     if (!controller) {
-      return;
+      throw new Error(`Invalid token "${token}".`);
     }
     delete this.abortControllers[token];
     controller.abort();
