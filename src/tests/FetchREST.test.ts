@@ -853,8 +853,8 @@ describe('abort', () => {
     class AbortController {
       readonly signal = 'xxx';
       // eslint-disable-next-line class-methods-use-this
-      abort(...args: any[]) {
-        abortHandler(...args);
+      abort() {
+        abortHandler();
       }
     }
     (window as any).AbortController = AbortController;
