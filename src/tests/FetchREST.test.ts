@@ -851,7 +851,7 @@ describe('abort', () => {
 
     const abortHandler = jest.fn();
     class AbortController {
-      readonly signal = 'xxx';
+      readonly signal = 'signal-1';
       // eslint-disable-next-line class-methods-use-this
       abort() {
         abortHandler();
@@ -862,6 +862,9 @@ describe('abort', () => {
     const abortToken = fetchRest.getAbortToken();
     fetchRest.get('/users', {}, {abortToken});
     fetchRest.abort(abortToken);
+
+    const {signal} = fetchMock.lastOptions();
+    expect(signal).toBe('signal-1');
     expect(abortHandler).toBeCalled();
   });
 
@@ -870,10 +873,8 @@ describe('abort', () => {
       apiUrl: 'https://api.github.com',
     });
 
-    try {
-      fetchRest.abort('xxx');
-    } catch (error) {
-      expect(error).toBeInstanceOf(Error);
-    }
+    expect(() => fetchRest.abort('signal-1')).toThrowError(
+      'Invalid token "signal-1".',
+    );
   });
 });
