@@ -198,6 +198,18 @@ fetchRest
   });
 ```
 
+### Basic `GET` that gets cancelled
+
+```ts
+const fetchRest = new FetchREST({
+  apiUrl: 'https://api.github.com',
+});
+
+const abortToken = fetchRest.getAbortToken();
+fetchRest.get('/users', {}, {abortToken});
+fetchRest.abort(abortToken);
+```
+
 ## 🏗 Contributing
 
 1.  Make your changes.
