@@ -2,8 +2,8 @@ import * as fetchMock from 'fetch-mock';
 import {
   MockLocalStorage,
   MockRequestOptions,
-  mockAbortController,
   mockFailingFetch,
+  mockAbortableFetch,
 } from './utils';
 import FetchREST, {Response} from '../';
 
@@ -262,6 +262,41 @@ describe('get', () => {
       done();
     });
   });
+
+  // it('allows for a global timeout option to be set', done => {
+  //   fetchMock.getOnce('*', {
+  //     status: 200,
+  //   });
+  //   const fetchRest = new FetchREST({
+  //     apiUrl: 'https://api.github.com',
+  //     timeout: 100,
+  //   });
+
+  //   const errorSpy = jest.fn();
+  //   fetchRest.get('/users').catch(errorSpy);
+
+  //   setTimeout(() => {
+  //     expect(errorSpy).toHaveBeenCalled();
+  //     done();
+  //   }, 100);
+  // });
+
+  // it('allows for a local timeout option to be set', done => {
+  //   fetchMock.getOnce('*', {
+  //     status: 200,
+  //   });
+  //   const fetchRest = new FetchREST({
+  //     apiUrl: 'https://api.github.com',
+  //   });
+
+  //   const errorSpy = jest.fn();
+  //   fetchRest.get('/users', {}, {timeout: 100}).catch(errorSpy);
+
+  //   setTimeout(() => {
+  //     expect(errorSpy).toHaveBeenCalled();
+  //     done();
+  //   }, 100);
+  // });
 });
 
 describe('post', () => {
@@ -830,20 +865,19 @@ describe('getAbortToken', () => {
 
 describe('abort', () => {
   it('allows for cancellation of the request', () => {
-    fetchMock.getOnce('*', {
-      status: 200,
-    });
     const fetchRest = new FetchREST({
       apiUrl: 'https://api.github.com',
     });
 
     const errorSpy = jest.fn();
 
+    const mockFetch = mockAbortableFetch();
+
     const abortToken = fetchRest.getAbortToken();
     fetchRest.get('/users', {}, {abortToken}).catch(errorSpy);
     fetchRest.abort(abortToken);
 
-    const {signal} = fetchMock.lastOptions();
+    const {signal} = mockFetch.lastOptions();
     expect(signal).toBeInstanceOf(AbortSignal);
     expect(errorSpy).toBeCalledWith(
       'DOMException: The user aborted a request.',
@@ -859,22 +893,4 @@ describe('abort', () => {
       'Invalid token "token-1".',
     );
   });
-
-  // it('allows for a global timeout option to be set', done => {
-  //   fetchMock.getOnce('*', {
-  //     status: 200,
-  //   });
-  //   const fetchRest = new FetchREST({
-  //     apiUrl: 'https://api.github.com',
-  //     timeout: 500,
-  //   });
-
-  //   const errorSpy = jest.fn();
-  //   fetchRest.get('/users').catch(errorSpy);
-
-  //   setTimeout(() => {
-  //     expect(errorSpy).toHaveBeenCalled();
-  //     done();
-  //   }, 500);
-  // });
 });
