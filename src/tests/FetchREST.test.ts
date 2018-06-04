@@ -1,11 +1,11 @@
 import * as fetchMock from 'fetch-mock';
+import {
+  MockLocalStorage,
+  MockRequestOptions,
+  mockAbortController,
+  mockFailingFetch,
+} from './utils';
 import FetchREST, {Response} from '../';
-
-type MockRequestOptions = fetchMock.MockResponseObject;
-
-interface MockLocalStorage {
-  [key: string]: string;
-}
 
 beforeEach(() => fetchMock.restore());
 
@@ -255,10 +255,7 @@ describe('get', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockFailingFetch();
 
     request.get('/users').catch(error => {
       expect(error).toBeInstanceOf(Error);
@@ -777,10 +774,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockFailingFetch();
 
     fetchRest.middleware(request => request.catch(requestErrorHandler));
 
@@ -795,10 +789,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockFailingFetch();
 
     fetchRest.middleware(request =>
       request.catch(error => {
@@ -816,10 +807,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockFailingFetch();
 
     fetchRest.middleware(request =>
       request.catch(() => ({body: null, status: 0, success: false})),
@@ -849,23 +837,17 @@ describe('abort', () => {
       apiUrl: 'https://api.github.com',
     });
 
-    const abortHandler = jest.fn();
-    class AbortController {
-      readonly signal = 'signal-1';
-      // eslint-disable-next-line class-methods-use-this
-      abort() {
-        abortHandler();
-      }
-    }
-    (window as any).AbortController = AbortController;
+    const errorSpy = jest.fn();
 
     const abortToken = fetchRest.getAbortToken();
-    fetchRest.get('/users', {}, {abortToken});
+    fetchRest.get('/users', {}, {abortToken}).catch(errorSpy);
     fetchRest.abort(abortToken);
 
     const {signal} = fetchMock.lastOptions();
-    expect(signal).toBe('signal-1');
-    expect(abortHandler).toBeCalled();
+    expect(signal).toBeInstanceOf(AbortSignal);
+    expect(errorSpy).toBeCalledWith(
+      'DOMException: The user aborted a request.',
+    );
   });
 
   it('calling abort with an invalid token throws an error', () => {
@@ -873,8 +855,26 @@ describe('abort', () => {
       apiUrl: 'https://api.github.com',
     });
 
-    expect(() => fetchRest.abort('signal-1')).toThrowError(
-      'Invalid token "signal-1".',
+    expect(() => fetchRest.abort('token-1')).toThrowError(
+      'Invalid token "token-1".',
     );
   });
+
+  // it('allows for a global timeout option to be set', done => {
+  //   fetchMock.getOnce('*', {
+  //     status: 200,
+  //   });
+  //   const fetchRest = new FetchREST({
+  //     apiUrl: 'https://api.github.com',
+  //     timeout: 500,
+  //   });
+
+  //   const errorSpy = jest.fn();
+  //   fetchRest.get('/users').catch(errorSpy);
+
+  //   setTimeout(() => {
+  //     expect(errorSpy).toHaveBeenCalled();
+  //     done();
+  //   }, 500);
+  // });
 });

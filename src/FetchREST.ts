@@ -12,6 +12,7 @@ type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
 export type RequestOptions = RequestInit & {
   apiUrl?: string;
+  timeout?: number;
   abortToken?: string;
   body?: undefined;
   method?: undefined;
@@ -133,11 +134,21 @@ export default class FetchREST {
         ? JSON.stringify(payload)
         : payload;
 
-    if (fetchOptions.abortToken) {
+    if (fetchOptions.abortToken || fetchOptions.timeout) {
       const controller = new AbortController();
       fetchOptions.signal = controller.signal;
-      this.abortControllers[fetchOptions.abortToken] = controller;
-      delete fetchOptions.abortToken;
+      const abortToken = fetchOptions.abortToken || this.getAbortToken();
+      this.abortControllers[abortToken] = controller;
+
+      if (fetchOptions.abortToken) {
+        delete fetchOptions.abortToken;
+      }
+
+      if (fetchOptions.timeout) {
+        const {timeout} = fetchOptions;
+        setTimeout(() => this.abort(abortToken), timeout);
+        delete fetchOptions.timeout;
+      }
     }
 
     const baseRequest = fetch(`${apiUrl}${endpoint}`, fetchOptions).then(
