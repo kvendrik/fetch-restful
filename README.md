@@ -180,7 +180,7 @@ fetchRest
   });
 ```
 
-### Canceling a request.
+### Cancelling a request.
 
 ```ts
 const fetchRest = new FetchREST({
