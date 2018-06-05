@@ -31,7 +31,7 @@ export default class FetchREST {
   private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
   private requestMiddleware: Middleware;
   private abortControllers: {
-    [key: string]: AbortController;
+    [token: string]: AbortController;
   } = {};
 
   constructor(options: GlobalRequestOptions | GlobalRequestOptionsGetter) {
