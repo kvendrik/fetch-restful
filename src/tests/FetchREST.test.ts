@@ -894,7 +894,7 @@ describe('abort', () => {
     const request = fetchRest.get('/users', {}, {abortToken});
 
     const {signal} = mock.lastOptions();
-    expect(signal).toBeInstanceOf(AbortSignal);
+    expect(signal).toBeInstanceOf((window as any).AbortSignal);
 
     fetchRest.abort(abortToken);
     expect(request).rejects.toHaveProperty(
