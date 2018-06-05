@@ -1,5 +1,5 @@
 import * as fetchMock from 'fetch-mock';
-import {MockLocalStorage, mockSpecialFetch} from './utils';
+import {MockLocalStorage, mockSpecialFetch, AbortWindow} from './utils';
 import FetchREST, {Response} from '../';
 
 type MockRequestOptions = fetchMock.MockResponseObject;
@@ -894,7 +894,7 @@ describe('abort', () => {
     const request = fetchRest.get('/users', {}, {abortToken});
 
     const {signal} = mock.lastOptions();
-    expect(signal).toBeInstanceOf((window as any).AbortSignal);
+    expect(signal).toBeInstanceOf((window as AbortWindow).AbortSignal);
 
     fetchRest.abort(abortToken);
     expect(request).rejects.toHaveProperty(

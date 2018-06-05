@@ -1,5 +1,6 @@
-type AbortWindow = Window & {
+export type AbortWindow = Window & {
   AbortController: AbortController;
+  AbortSignal: AbortSignal;
 };
 
 export default class MockSpecialFetch {
