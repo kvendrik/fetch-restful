@@ -62,19 +62,6 @@ const request = new FetchREST({
 await request.get('/users/kvendrik');
 ```
 
-### Basic `GET` with options getter
-
-```ts
-const fetchRest = new FetchREST(() => ({
-  apiUrl: 'https://yourapi.com',
-  headers: {
-    'X-Timestamp': new Date().getTime(),
-  },
-}));
-
-await fetchRest.get('/users/kvendrik');
-```
-
 ### Basic `GET` with query
 
 ```ts
@@ -89,7 +76,20 @@ await fetchRest.get('/users', {
 });
 ```
 
-### Basic `GET` with JSON headers
+### Using an options getter
+
+```ts
+const fetchRest = new FetchREST(() => ({
+  apiUrl: 'https://yourapi.com',
+  headers: {
+    'X-Timestamp': new Date().getTime(),
+  },
+}));
+
+await fetchRest.get('/users/kvendrik');
+```
+
+### Setting global headers
 
 ```ts
 const request = new FetchREST({
@@ -103,7 +103,7 @@ const request = new FetchREST({
 await request.get('/users/kvendrik');
 ```
 
-### Basic `GET` with JSON headers and override
+### Overriding headers
 
 ```ts
 const request = new FetchREST({
@@ -125,25 +125,7 @@ await request.get(
 );
 ```
 
-### Basic `GET` with JSON headers and override using options getter
-
-```ts
-const request = new FetchREST({
-  apiUrl: 'https://api.github.com',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-});
-
-await request.get('/users/kvendrik', {}, () => ({
-  headers: {
-    Authorization: 'Bearer xxx',
-  },
-}));
-```
-
-### Basic `GET` with timestamp added to all responses
+### Adding data to all responses
 
 ```ts
 const fetchRest = new FetchREST({
@@ -157,7 +139,7 @@ fetchRest.middleware(request =>
 await fetchRest.get('/users/kvendrik');
 ```
 
-### Basic `GET` with global error handler (resolved)
+### Global and local error handling (resolved)
 
 ```ts
 const fetchRest = new FetchREST({
@@ -174,7 +156,7 @@ fetchRest.middleware(request =>
 await fetchRest.get('/users/kvendrik');
 ```
 
-### Basic `GET` with global and local error handler (unresolved)
+### Global and local error handling (unresolved)
 
 ```ts
 const fetchRest = new FetchREST({
@@ -198,7 +180,7 @@ fetchRest
   });
 ```
 
-### Basic `GET` that gets cancelled
+### Canceling a request
 
 ```ts
 const fetchRest = new FetchREST({
@@ -208,6 +190,31 @@ const fetchRest = new FetchREST({
 const abortToken = fetchRest.getAbortToken();
 fetchRest.get('/users', {}, {abortToken});
 fetchRest.abort(abortToken);
+```
+
+### Request timeout
+
+```ts
+const fetchRest = new FetchREST({
+  apiUrl: 'https://api.github.com',
+});
+
+fetchRest.get('/users', {}, {timeout: 500});
+```
+
+### Working with multiple APIs
+
+```ts
+const githubApi = new FetchREST({
+  apiUrl: 'https://api.github.com',
+});
+
+const appApi = new FetchREST({
+  apiUrl: 'https://api.yourapp.com',
+});
+
+await githubApi.get('/users');
+await appApi.get('/users');
 ```
 
 ## 🏗 Contributing
