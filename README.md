@@ -52,7 +52,7 @@ request.middleware(Middleware);
 
 ## Examples
 
-### Basic `GET`
+### Basic `GET`.
 
 ```ts
 const request = new FetchREST({
@@ -62,7 +62,7 @@ const request = new FetchREST({
 await request.get('/users/kvendrik');
 ```
 
-### Basic `GET` with query
+### Basic `GET` with query.
 
 ```ts
 const fetchRest = new FetchREST({
@@ -76,7 +76,7 @@ await fetchRest.get('/users', {
 });
 ```
 
-### Using an options getter
+### Using an options getter.
 
 ```ts
 const fetchRest = new FetchREST(() => ({
@@ -89,7 +89,7 @@ const fetchRest = new FetchREST(() => ({
 await fetchRest.get('/users/kvendrik');
 ```
 
-### Setting global headers
+### Setting global headers.
 
 ```ts
 const request = new FetchREST({
@@ -103,7 +103,7 @@ const request = new FetchREST({
 await request.get('/users/kvendrik');
 ```
 
-### Overriding headers
+### Overriding headers.
 
 ```ts
 const request = new FetchREST({
@@ -125,7 +125,7 @@ await request.get(
 );
 ```
 
-### Adding data to all responses
+### Adding data to all responses.
 
 ```ts
 const fetchRest = new FetchREST({
@@ -139,7 +139,7 @@ fetchRest.middleware(request =>
 await fetchRest.get('/users/kvendrik');
 ```
 
-### Global and local error handling (resolved)
+### Global and local error handling (resolved).
 
 ```ts
 const fetchRest = new FetchREST({
@@ -156,7 +156,7 @@ fetchRest.middleware(request =>
 await fetchRest.get('/users/kvendrik');
 ```
 
-### Global and local error handling (unresolved)
+### Global and local error handling (unresolved).
 
 ```ts
 const fetchRest = new FetchREST({
@@ -180,7 +180,7 @@ fetchRest
   });
 ```
 
-### Canceling a request
+### Canceling a request.
 
 ```ts
 const fetchRest = new FetchREST({
@@ -192,7 +192,7 @@ fetchRest.get('/users', {}, {abortToken});
 fetchRest.abort(abortToken);
 ```
 
-### Request timeout
+### Request timeout.
 
 ```ts
 const fetchRest = new FetchREST({
@@ -202,7 +202,7 @@ const fetchRest = new FetchREST({
 fetchRest.get('/users', {}, {timeout: 500});
 ```
 
-### Working with multiple APIs
+### Working with multiple APIs.
 
 ```ts
 const githubApi = new FetchREST({
