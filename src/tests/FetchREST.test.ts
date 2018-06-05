@@ -1,13 +1,14 @@
 import * as fetchMock from 'fetch-mock';
-import {
-  MockLocalStorage,
-  MockRequestOptions,
-  mockFailingFetch,
-  mockAbortableFetch,
-} from './utils';
+import {MockLocalStorage, mockSpecialFetch} from './utils';
 import FetchREST, {Response} from '../';
 
-beforeEach(() => fetchMock.restore());
+type MockRequestOptions = fetchMock.MockResponseObject;
+
+beforeEach(() => {
+  fetchMock.restore();
+  mockSpecialFetch.restore();
+  jest.useFakeTimers();
+});
 
 describe('get', () => {
   it('does a request to the correct endpoint and API URL', async () => {
@@ -255,7 +256,7 @@ describe('get', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    mockFailingFetch();
+    mockSpecialFetch.failingFetch();
 
     request.get('/users').catch(error => {
       expect(error).toBeInstanceOf(Error);
@@ -263,40 +264,58 @@ describe('get', () => {
     });
   });
 
-  // it('allows for a global timeout option to be set', done => {
-  //   fetchMock.getOnce('*', {
-  //     status: 200,
-  //   });
-  //   const fetchRest = new FetchREST({
-  //     apiUrl: 'https://api.github.com',
-  //     timeout: 100,
-  //   });
+  it('allows for a global timeout option to be set', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+      timeout: 100,
+    });
 
-  //   const errorSpy = jest.fn();
-  //   fetchRest.get('/users').catch(errorSpy);
+    mockSpecialFetch.abortableFetch();
 
-  //   setTimeout(() => {
-  //     expect(errorSpy).toHaveBeenCalled();
-  //     done();
-  //   }, 100);
-  // });
+    const request = fetchRest.get('/users');
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 100);
 
-  // it('allows for a local timeout option to be set', done => {
-  //   fetchMock.getOnce('*', {
-  //     status: 200,
-  //   });
-  //   const fetchRest = new FetchREST({
-  //     apiUrl: 'https://api.github.com',
-  //   });
+    jest.advanceTimersByTime(100);
 
-  //   const errorSpy = jest.fn();
-  //   fetchRest.get('/users', {}, {timeout: 100}).catch(errorSpy);
+    expect(request).rejects.toHaveProperty(
+      'message',
+      'DOMException: The user aborted a request.',
+    );
+  });
 
-  //   setTimeout(() => {
-  //     expect(errorSpy).toHaveBeenCalled();
-  //     done();
-  //   }, 100);
-  // });
+  it('allows for a local timeout option to be set', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    mockSpecialFetch.abortableFetch();
+
+    const request = fetchRest.get('/users', {}, {timeout: 200});
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 200);
+
+    jest.advanceTimersByTime(200);
+
+    expect(request).rejects.toHaveProperty(
+      'message',
+      'DOMException: The user aborted a request.',
+    );
+  });
+
+  it('does not set a timeout when not specified', () => {
+    fetchMock.getOnce('*', {
+      status: 200,
+    });
+
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    const request = fetchRest.get('/users');
+    expect(setTimeout).not.toBeCalled();
+    expect(request).resolves.toHaveProperty('status', 200);
+  });
 });
 
 describe('post', () => {
@@ -809,7 +828,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    mockFailingFetch();
+    mockSpecialFetch.failingFetch();
 
     fetchRest.middleware(request => request.catch(requestErrorHandler));
 
@@ -824,7 +843,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    mockFailingFetch();
+    mockSpecialFetch.failingFetch();
 
     fetchRest.middleware(request =>
       request.catch(error => {
@@ -842,7 +861,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    mockFailingFetch();
+    mockSpecialFetch.failingFetch();
 
     fetchRest.middleware(request =>
       request.catch(() => ({body: null, status: 0, success: false})),
@@ -869,17 +888,17 @@ describe('abort', () => {
       apiUrl: 'https://api.github.com',
     });
 
-    const errorSpy = jest.fn();
-
-    const mockFetch = mockAbortableFetch();
+    const mock = mockSpecialFetch.abortableFetch();
 
     const abortToken = fetchRest.getAbortToken();
-    fetchRest.get('/users', {}, {abortToken}).catch(errorSpy);
-    fetchRest.abort(abortToken);
+    const request = fetchRest.get('/users', {}, {abortToken});
 
-    const {signal} = mockFetch.lastOptions();
+    const {signal} = mock.lastOptions();
     expect(signal).toBeInstanceOf(AbortSignal);
-    expect(errorSpy).toBeCalledWith(
+
+    fetchRest.abort(abortToken);
+    expect(request).rejects.toHaveProperty(
+      'message',
       'DOMException: The user aborted a request.',
     );
   });
