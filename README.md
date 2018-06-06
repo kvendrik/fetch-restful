@@ -103,7 +103,7 @@ const request = new FetchREST({
 await request.get('/users/kvendrik');
 ```
 
-### Overriding headers.
+### Locally adding and/or overriding headers.
 
 ```ts
 const request = new FetchREST({
@@ -120,6 +120,7 @@ await request.get(
   {
     headers: {
       Authorization: 'Bearer xxx',
+      Accept: 'text/xml',
     },
   },
 );
