@@ -1,13 +1,14 @@
 import * as fetchMock from 'fetch-mock';
+import {MockLocalStorage, mockSpecialFetch, AbortWindow} from './utils';
 import FetchREST, {Response} from '../';
 
 type MockRequestOptions = fetchMock.MockResponseObject;
 
-interface MockLocalStorage {
-  [key: string]: string;
-}
-
-beforeEach(() => fetchMock.restore());
+beforeEach(() => {
+  fetchMock.restore();
+  mockSpecialFetch.restore();
+  jest.useFakeTimers();
+});
 
 describe('get', () => {
   it('does a request to the correct endpoint and API URL', async () => {
@@ -255,15 +256,65 @@ describe('get', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockSpecialFetch.failingFetch();
 
     request.get('/users').catch(error => {
       expect(error).toBeInstanceOf(Error);
       done();
     });
+  });
+
+  it('allows for a global timeout option to be set', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+      timeout: 100,
+    });
+
+    mockSpecialFetch.abortableFetch();
+
+    const request = fetchRest.get('/users');
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 100);
+
+    jest.advanceTimersByTime(100);
+
+    return expect(request).rejects.toHaveProperty(
+      'message',
+      'DOMException: The user aborted a request.',
+    );
+  });
+
+  it('allows for a local timeout option to be set', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    mockSpecialFetch.abortableFetch();
+
+    const request = fetchRest.get('/users', {}, {timeout: 200});
+    expect(setTimeout).toHaveBeenCalledTimes(1);
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 200);
+
+    jest.advanceTimersByTime(200);
+
+    return expect(request).rejects.toHaveProperty(
+      'message',
+      'DOMException: The user aborted a request.',
+    );
+  });
+
+  it('does not set a timeout when not specified', () => {
+    fetchMock.getOnce('*', {
+      status: 200,
+    });
+
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    const request = fetchRest.get('/users');
+    expect(setTimeout).not.toBeCalled();
+    expect(request).resolves.toHaveProperty('status', 200);
   });
 });
 
@@ -777,10 +828,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockSpecialFetch.failingFetch();
 
     fetchRest.middleware(request => request.catch(requestErrorHandler));
 
@@ -795,10 +843,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockSpecialFetch.failingFetch();
 
     fetchRest.middleware(request =>
       request.catch(error => {
@@ -816,10 +861,7 @@ describe('middleware', () => {
       apiUrl: 'https://url/that/is/not/valid.com',
     });
 
-    window.fetch = () =>
-      new Promise(() => {
-        throw new Error('Network request failed.');
-      });
+    mockSpecialFetch.failingFetch();
 
     fetchRest.middleware(request =>
       request.catch(() => ({body: null, status: 0, success: false})),
@@ -827,5 +869,74 @@ describe('middleware', () => {
 
     const response = await fetchRest.get('/users/kvendrik');
     expect(response).toEqual({body: null, status: 0, success: false});
+  });
+});
+
+describe('getAbortToken', () => {
+  it('returns an unique token', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+    const token = fetchRest.getAbortToken();
+    expect(typeof token).toBe('string');
+  });
+});
+
+describe('abort', () => {
+  it('allows for cancellation of the request', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    const mock = mockSpecialFetch.abortableFetch();
+
+    const abortToken = fetchRest.getAbortToken();
+    const request = fetchRest.get('/users', {}, {abortToken});
+
+    const {signal} = mock.lastOptions();
+    expect(signal).toBeInstanceOf((window as AbortWindow).AbortSignal);
+
+    fetchRest.abort(abortToken);
+
+    return expect(request).rejects.toHaveProperty(
+      'message',
+      'DOMException: The user aborted a request.',
+    );
+  });
+
+  it('allows for cancellation of multiple requests', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    mockSpecialFetch.abortableFetch();
+
+    const abortToken = fetchRest.getAbortToken();
+
+    const request = fetchRest.get('/users', {}, {abortToken});
+    const secondRequest = fetchRest.get('/users', {}, {abortToken});
+
+    fetchRest.abort(abortToken);
+
+    return Promise.all([
+      expect(request).rejects.toHaveProperty(
+        'message',
+        'DOMException: The user aborted a request.',
+      ),
+      expect(secondRequest).rejects.toHaveProperty(
+        'message',
+        'DOMException: The user aborted a request.',
+      ),
+    ]);
+  });
+
+  it('calling abort with an invalid token throws an error', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    expect(() => fetchRest.abort('token-1')).toThrowError(
+      'Invalid token "token-1".',
+    );
   });
 });

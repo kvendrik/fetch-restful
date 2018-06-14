@@ -1,4 +1,3 @@
-import 'whatwg-fetch';
 import queryObjectToString, {QueryObject} from './queryObjectToString';
 
 export type Payload = RequestInit['body'] | object;
@@ -13,6 +12,8 @@ type RequestMethod = 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
 
 export type RequestOptions = RequestInit & {
   apiUrl?: string;
+  timeout?: number;
+  abortToken?: string;
   body?: undefined;
   method?: undefined;
 };
@@ -20,6 +21,7 @@ export type RequestOptionsGetter = () => RequestOptions;
 
 export type GlobalRequestOptions = RequestOptions & {
   apiUrl: string;
+  abortToken?: undefined;
 };
 export type GlobalRequestOptionsGetter = () => GlobalRequestOptions;
 
@@ -28,6 +30,9 @@ export type Middleware = (response: Promise<Response>) => Promise<Response>;
 export default class FetchREST {
   private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
   private requestMiddleware: Middleware;
+  private abortControllers: {
+    [token: string]: AbortController[];
+  } = {};
 
   constructor(options: GlobalRequestOptions | GlobalRequestOptionsGetter) {
     this.globalOptions = options;
@@ -78,6 +83,30 @@ export default class FetchREST {
     return this.request('DELETE', endpoint, payload, options);
   }
 
+  abort(token: string) {
+    const controllers = this.abortControllers[token];
+
+    if (!controllers) {
+      throw new Error(`Invalid token "${token}".`);
+    }
+
+    delete this.abortControllers[token];
+
+    for (const controller of controllers) {
+      controller.abort();
+    }
+  }
+
+  getAbortToken() {
+    let token = '';
+    while (token === '' || this.abortControllers[token]) {
+      token = Math.random()
+        .toString(36)
+        .substring(2, 15);
+    }
+    return token;
+  }
+
   private request(
     method: RequestMethod,
     endpoint: string,
@@ -109,6 +138,28 @@ export default class FetchREST {
       payload !== null && typeof payload === 'object'
         ? JSON.stringify(payload)
         : payload;
+
+    if (fetchOptions.abortToken || fetchOptions.timeout) {
+      const controller = new AbortController();
+      fetchOptions.signal = controller.signal;
+      const abortToken = fetchOptions.abortToken || this.getAbortToken();
+
+      if (!this.abortControllers[abortToken]) {
+        this.abortControllers[abortToken] = [];
+      }
+
+      this.abortControllers[abortToken].push(controller);
+
+      if (fetchOptions.abortToken) {
+        delete fetchOptions.abortToken;
+      }
+
+      if (fetchOptions.timeout) {
+        const {timeout} = fetchOptions;
+        setTimeout(() => this.abort(abortToken), timeout);
+        delete fetchOptions.timeout;
+      }
+    }
 
     const baseRequest = fetch(`${apiUrl}${endpoint}`, fetchOptions).then(
       async res => {
