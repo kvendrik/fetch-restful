@@ -278,7 +278,7 @@ describe('get', () => {
 
     jest.advanceTimersByTime(100);
 
-    expect(request).rejects.toHaveProperty(
+    return expect(request).rejects.toHaveProperty(
       'message',
       'DOMException: The user aborted a request.',
     );
@@ -297,7 +297,7 @@ describe('get', () => {
 
     jest.advanceTimersByTime(200);
 
-    expect(request).rejects.toHaveProperty(
+    return expect(request).rejects.toHaveProperty(
       'message',
       'DOMException: The user aborted a request.',
     );
@@ -897,10 +897,37 @@ describe('abort', () => {
     expect(signal).toBeInstanceOf((window as AbortWindow).AbortSignal);
 
     fetchRest.abort(abortToken);
-    expect(request).rejects.toHaveProperty(
+
+    return expect(request).rejects.toHaveProperty(
       'message',
       'DOMException: The user aborted a request.',
     );
+  });
+
+  it('allows for cancellation of multiple requests', () => {
+    const fetchRest = new FetchREST({
+      apiUrl: 'https://api.github.com',
+    });
+
+    mockSpecialFetch.abortableFetch();
+
+    const abortToken = fetchRest.getAbortToken();
+
+    const request = fetchRest.get('/users', {}, {abortToken});
+    const secondRequest = fetchRest.get('/users', {}, {abortToken});
+
+    fetchRest.abort(abortToken);
+
+    return Promise.all([
+      expect(request).rejects.toHaveProperty(
+        'message',
+        'DOMException: The user aborted a request.',
+      ),
+      expect(secondRequest).rejects.toHaveProperty(
+        'message',
+        'DOMException: The user aborted a request.',
+      ),
+    ]);
   });
 
   it('calling abort with an invalid token throws an error', () => {

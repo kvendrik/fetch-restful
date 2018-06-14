@@ -26,18 +26,12 @@ export default class MockSpecialFetch {
   abortableFetch() {
     let lastOptions: RequestInit = {};
 
-    window.fetch = (url, options = {}) =>
-      new Promise((resolve, reject) => {
-        const abortSignal = options.signal;
+    window.fetch = (_url, options) =>
+      new Promise((_resolve, reject) => {
+        const abortSignal = options!.signal;
+        lastOptions = options!;
 
-        if (!abortSignal) {
-          reject(new Error('No signal given.'));
-          return;
-        }
-
-        lastOptions = options;
-
-        abortSignal.onabort = () =>
+        abortSignal!.onabort = () =>
           reject(new Error('DOMException: The user aborted a request.'));
       });
 

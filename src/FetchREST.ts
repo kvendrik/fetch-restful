@@ -31,7 +31,7 @@ export default class FetchREST {
   private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
   private requestMiddleware: Middleware;
   private abortControllers: {
-    [token: string]: AbortController;
+    [token: string]: AbortController[];
   } = {};
 
   constructor(options: GlobalRequestOptions | GlobalRequestOptionsGetter) {
@@ -84,12 +84,17 @@ export default class FetchREST {
   }
 
   abort(token: string) {
-    const controller = this.abortControllers[token];
-    if (!controller) {
+    const controllers = this.abortControllers[token];
+
+    if (!controllers) {
       throw new Error(`Invalid token "${token}".`);
     }
+
     delete this.abortControllers[token];
-    controller.abort();
+
+    for (const controller of controllers) {
+      controller.abort();
+    }
   }
 
   getAbortToken() {
@@ -138,7 +143,12 @@ export default class FetchREST {
       const controller = new AbortController();
       fetchOptions.signal = controller.signal;
       const abortToken = fetchOptions.abortToken || this.getAbortToken();
-      this.abortControllers[abortToken] = controller;
+
+      if (!this.abortControllers[abortToken]) {
+        this.abortControllers[abortToken] = [];
+      }
+
+      this.abortControllers[abortToken].push(controller);
 
       if (fetchOptions.abortToken) {
         delete fetchOptions.abortToken;
