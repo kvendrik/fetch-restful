@@ -25,20 +25,21 @@ export type GlobalRequestOptions = RequestOptions & {
 };
 export type GlobalRequestOptionsGetter = () => GlobalRequestOptions;
 
-export type Middleware = (response: Promise<Response>) => Promise<Response>;
+export type Middleware<T> = (response: Promise<Response>) => Promise<T>;
 
-export default class FetchREST {
+export default class FetchREST<TransformedResponse = Response> {
   private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
-  private requestMiddleware: Middleware;
+  private requestMiddleware: Middleware<TransformedResponse>;
   private abortControllers: {
     [token: string]: AbortController[];
   } = {};
 
   constructor(options: GlobalRequestOptions | GlobalRequestOptionsGetter) {
     this.globalOptions = options;
+    this.requestMiddleware = request => request;
   }
 
-  middleware(middleware: Middleware) {
+  middleware(middleware: Middleware<TransformedResponse>) {
     this.requestMiddleware = middleware;
   }
 
@@ -185,10 +186,6 @@ export default class FetchREST {
         return {...resData, body: finalBody};
       },
     );
-
-    if (!this.requestMiddleware) {
-      return baseRequest;
-    }
 
     return this.requestMiddleware(baseRequest);
   }
