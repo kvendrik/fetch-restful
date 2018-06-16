@@ -808,7 +808,11 @@ describe('middleware', () => {
       status: 200,
     });
 
-    const fetchRest = new FetchREST({
+    interface ResponseWithDate extends Response {
+      date: string;
+    }
+
+    const fetchRest = new FetchREST<ResponseWithDate>({
       apiUrl: 'https://testapi.com',
     });
 
@@ -816,9 +820,7 @@ describe('middleware', () => {
       request.then(response => ({...response, date: '14-04-2017'})),
     );
 
-    const {date} = (await fetchRest.post('/users')) as Response & {
-      date: string;
-    };
+    const {date} = await fetchRest.post('/users');
     expect(date).toBe('14-04-2017');
   });
 
