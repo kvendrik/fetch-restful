@@ -17,7 +17,6 @@ export type RequestOptions = RequestInit & {
   body?: undefined;
   method?: undefined;
 };
-export type RequestOptionsGetter = () => RequestOptions;
 
 export type GlobalRequestOptions = RequestOptions & {
   apiUrl: string;
@@ -42,11 +41,7 @@ export default class FetchREST {
     this.requestMiddleware = middleware;
   }
 
-  get(
-    endpoint: string,
-    query: QueryObject = {},
-    options: RequestOptions | RequestOptionsGetter = {},
-  ) {
+  get(endpoint: string, query: QueryObject = {}, options: RequestOptions = {}) {
     const queryString = queryObjectToString(query);
     return this.request('GET', `${endpoint}${queryString}`, null, options);
   }
@@ -54,7 +49,7 @@ export default class FetchREST {
   post(
     endpoint: string,
     payload: Payload = null,
-    options: RequestOptions | RequestOptionsGetter = {},
+    options: RequestOptions = {},
   ) {
     return this.request('POST', endpoint, payload, options);
   }
@@ -62,23 +57,19 @@ export default class FetchREST {
   patch(
     endpoint: string,
     payload: Payload = null,
-    options: RequestOptions | RequestOptionsGetter = {},
+    options: RequestOptions = {},
   ) {
     return this.request('PATCH', endpoint, payload, options);
   }
 
-  put(
-    endpoint: string,
-    payload: Payload = null,
-    options: RequestOptions | RequestOptionsGetter = {},
-  ) {
+  put(endpoint: string, payload: Payload = null, options: RequestOptions = {}) {
     return this.request('PUT', endpoint, payload, options);
   }
 
   delete(
     endpoint: string,
     payload: Payload = null,
-    options: RequestOptions | RequestOptionsGetter = {},
+    options: RequestOptions = {},
   ) {
     return this.request('DELETE', endpoint, payload, options);
   }
@@ -111,12 +102,10 @@ export default class FetchREST {
     method: RequestMethod,
     endpoint: string,
     payload: Payload,
-    givenOptions: RequestOptions | RequestOptionsGetter,
+    options: RequestOptions,
   ) {
     const {globalOptions: givenGlobalOptions} = this;
-
-    const globalOptions = getOptionsFromOptionsGetter(givenGlobalOptions);
-    const options = getOptionsFromOptionsGetter(givenOptions);
+    const globalOptions = getGlobalOptionsFromOptionsGetter(givenGlobalOptions);
 
     const fetchOptions = {
       ...(globalOptions as RequestInit),
@@ -194,8 +183,8 @@ export default class FetchREST {
   }
 }
 
-function getOptionsFromOptionsGetter(
-  options: RequestOptions | RequestOptionsGetter,
+function getGlobalOptionsFromOptionsGetter(
+  options: GlobalRequestOptions | GlobalRequestOptionsGetter,
 ) {
   if (typeof options === 'function') {
     return options();
