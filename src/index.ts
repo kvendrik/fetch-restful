@@ -5,7 +5,6 @@ export {
   default,
   Payload,
   Response,
-  RequestOptionsGetter,
   RequestOptions,
   GlobalRequestOptions,
   GlobalRequestOptionsGetter,
