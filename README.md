@@ -28,17 +28,16 @@ const request = new FetchREST(
 ### Request methods.
 
 ```ts
-await request.get('/users', QueryObject, RequestOptions | RequestOptionsGetter);
-await request.post('/users', Payload, RequestOptions | RequestOptionsGetter);
-await request.patch('/users', Payload, RequestOptions | RequestOptionsGetter);
-await request.put('/users', Payload, RequestOptions | RequestOptionsGetter);
-await request.delete('/users', Payload, RequestOptions | RequestOptionsGetter);
+await request.get('/users', QueryObject, RequestOptions);
+await request.post('/users', Payload, RequestOptions);
+await request.patch('/users', Payload, RequestOptions);
+await request.put('/users', Payload, RequestOptions);
+await request.delete('/users', Payload, RequestOptions);
 ```
 
 * [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
 * [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L4) - your request payload.
 * [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L14) - request options that will be merged with your global request options.
-* [`RequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L19) - a method that returns a `RequestOptions` object.
 
 ### Middleware
 
