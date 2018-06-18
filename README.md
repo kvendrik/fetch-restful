@@ -23,7 +23,7 @@ const request = new FetchREST(
 ```
 
 * [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L21) - request options that will be used as the defaults for every outgoing request.
-* [`GlobalRequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L24) - a method that returns a `GlobalRequestOptions` object.
+* [`GlobalRequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L25) - a method that returns a `GlobalRequestOptions` object.
 
 ### Request methods.
 
@@ -36,8 +36,8 @@ await request.delete('/users', Payload, RequestOptions);
 ```
 
 * [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
-* [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L4) - your request payload.
-* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L14) - request options that will be merged with your global request options.
+* [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L3) - your request payload.
+* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L13) - request options that will be merged with your global request options.
 
 ### Middleware
 
@@ -47,7 +47,7 @@ Use the middleware method to define a function that will be added to the promise
 request.middleware(Middleware);
 ```
 
-* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L26) - method that will be added to the promise chain.
+* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L27) - method that will be added to the promise chain.
 
 ## Examples
 
