@@ -10,4 +10,4 @@ export {
   GlobalRequestOptionsGetter,
   Middleware,
 } from './FetchREST';
-export {QueryObject} from './queryObjectToString';
+export {QueryObject} from './utilities';

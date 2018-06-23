@@ -760,8 +760,14 @@ describe('getAbortToken', () => {
     const fetchRest = new FetchREST({
       apiUrl: 'https://api.github.com',
     });
-    const token = fetchRest.getAbortToken();
-    expect(typeof token).toBe('string');
+
+    const tokens = [];
+
+    for (let i = 0; i < 10; i += 1) {
+      const newToken = fetchRest.getAbortToken();
+      expect(tokens).not.toContain(newToken);
+      tokens.push(newToken);
+    }
   });
 });
 
