@@ -17,7 +17,7 @@ yarn add fetch-restful
 ### Constructor
 
 ```ts
-const request = new FetchREST(
+const fetchRest = new FetchREST(
   GlobalRequestOptions | GlobalRequestOptionsGetter,
 );
 ```
@@ -28,16 +28,17 @@ const request = new FetchREST(
 ### Request methods.
 
 ```ts
-await request.get('/users', QueryObject, RequestOptions);
-await request.post('/users', Payload, RequestOptions);
-await request.patch('/users', Payload, RequestOptions);
-await request.put('/users', Payload, RequestOptions);
-await request.delete('/users', Payload, RequestOptions);
+fetchRest.get(endpoint: string, query?: QueryObject, options?: RequestOptions): Promise<Response>;
+fetchRest.post(endpoint: string, payload?: Payload, options?: RequestOptions): Promise<Response>;
+fetchRest.patch(endpoint: string, payload?: Payload, options?: RequestOptions): Promise<Response>;
+fetchRest.put(endpoint: string, payload?: Payload, options?: RequestOptions): Promise<Response>;
+fetchRest.delete(endpoint: string, payload?: Payload, options?: RequestOptions): Promise<Response>;
 ```
 
 * [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
 * [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L3) - your request payload.
 * [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L13) - request options that will be merged with your global request options.
+* [`Response`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L13) - this contains all the data from the response like the `status`, `body` and a `success` boolean.
 
 ### Middleware
 
