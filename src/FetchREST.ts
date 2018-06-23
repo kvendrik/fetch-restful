@@ -1,4 +1,8 @@
-import queryObjectToString, {QueryObject} from './queryObjectToString';
+import {
+  queryObjectToString,
+  QueryObject,
+  createUniqueIDFactory,
+} from './utilities';
 
 export type Payload = RequestInit['body'] | object;
 
@@ -25,6 +29,8 @@ export type GlobalRequestOptions = RequestOptions & {
 export type GlobalRequestOptionsGetter = () => GlobalRequestOptions;
 
 export type Middleware = (response: Promise<Response>) => Promise<Response>;
+
+const getUniqueAbortToken = createUniqueIDFactory('abort-token');
 
 export default class FetchREST {
   private globalOptions: GlobalRequestOptions | GlobalRequestOptionsGetter;
@@ -88,14 +94,9 @@ export default class FetchREST {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
   getAbortToken() {
-    let token = '';
-    while (token === '' || this.abortControllers[token]) {
-      token = Math.random()
-        .toString(36)
-        .substring(2, 15);
-    }
-    return token;
+    return getUniqueAbortToken();
   }
 
   private request(
