@@ -1,5 +1,5 @@
 import * as fetchMock from 'fetch-mock';
-import {MockLocalStorage, mockSpecialFetch, AbortWindow} from './utils';
+import {MockLocalStorage, mockSpecialFetch, AbortWindow} from './utilities';
 import FetchREST, {Response} from '../';
 
 type MockRequestOptions = fetchMock.MockResponseObject;
