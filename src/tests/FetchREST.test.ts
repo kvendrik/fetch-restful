@@ -11,8 +11,281 @@ describe('FetchREST', () => {
     jest.useFakeTimers();
   });
 
+  describe('request', () => {
+    describe('options', () => {
+      it('does a request to the correct endpoint and API URL', async () => {
+        const requestMock = fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        await request.get('/users');
+        expect(requestMock.lastUrl()).toBe('https://testapi.com/users');
+      });
+
+      it('allows method instead of object literal as global request options', async () => {
+        const mockLocalStorage: MockLocalStorage = {};
+        const requestMock = fetchMock.get('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST(() => ({
+          apiUrl: 'https://testapi.com',
+          headers: {
+            Authorization: mockLocalStorage.authToken,
+          },
+        }));
+
+        await request.get('/users');
+        const beforeOptions = requestMock.lastOptions() as MockRequestOptions;
+        expect(beforeOptions.headers!.Authorization).toBeUndefined();
+
+        mockLocalStorage.authToken = 'Bearer sahas2164sagafsg1245sfsax';
+
+        await request.get('/users');
+
+        const afterOptions = requestMock.lastOptions() as MockRequestOptions;
+        expect(afterOptions.headers!.Authorization).toBe(
+          'Bearer sahas2164sagafsg1245sfsax',
+        );
+      });
+
+      it('sends the defined headers', async () => {
+        const requestMock = fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        await request.get('/users');
+        const {headers} = requestMock.lastOptions() as MockRequestOptions;
+        expect(headers!.Accept).toBe('application/json');
+        expect(headers!['Content-Type']).toBe('application/json');
+      });
+
+      it('allows for local overwrite of options', async () => {
+        const requestMock = fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        await request.get(
+          '/users',
+          {},
+          {
+            apiUrl: 'https://superapi.com',
+            headers: {
+              Accept: 'text/xml',
+            },
+          },
+        );
+
+        const {headers} = requestMock.lastOptions() as MockRequestOptions;
+        expect(headers!.Accept).toBe('text/xml');
+        expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
+      });
+
+      it('merges global headers with nested local headers', async () => {
+        const requestMock = fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+
+        await request.get(
+          '/users',
+          {},
+          {
+            headers: {
+              Accept: 'text/xml',
+            },
+          },
+        );
+
+        const {headers} = requestMock.lastOptions() as MockRequestOptions;
+        expect(headers!.Accept).toBe('text/xml');
+        expect(headers!['Content-Type']).toBe('application/json');
+      });
+
+      it('does not pass the API URL to the fetch options', async () => {
+        const requestMock = fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        await request.get('/users');
+
+        const {apiUrl} = requestMock.lastOptions() as MockRequestOptions & {
+          apiUrl?: string;
+        };
+        expect(apiUrl).toBeUndefined();
+      });
+    });
+
+    describe('response', () => {
+      it('returns JSON it gets back as an object', async () => {
+        fetchMock.getOnce('*', {
+          status: 200,
+          body: JSON.stringify({data: '12345'}),
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        const {body} = await request.get('/users');
+        expect(typeof body).toBe('object');
+      });
+
+      it('returns non-JSON it gets back as plain text', async () => {
+        fetchMock.getOnce('*', {
+          status: 403,
+          body: 'Forbidden.',
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        const {body} = await request.get('/users');
+        expect(body).toBe('Forbidden.');
+      });
+
+      it('returns a success boolean', async () => {
+        fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        const {success} = await request.get('/users');
+        expect(success).toBeTruthy();
+      });
+
+      it('send a false success boolean when the status is not 200', async () => {
+        fetchMock.getOnce('*', {
+          status: 404,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        const {success} = await request.get('/users/2617281');
+        expect(success).toBeFalsy();
+      });
+
+      it('returns the response status', async () => {
+        fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const request = new FetchREST({
+          apiUrl: 'https://testapi.com',
+        });
+
+        const {status} = await request.get('/users');
+        expect(status).toBe(200);
+      });
+
+      it('allows a catch method to catch errors', done => {
+        const request = new FetchREST({
+          apiUrl: 'https://url/that/is/not/valid.com',
+        });
+
+        mockSpecialFetch.failingFetch();
+
+        request.get('/users').catch(error => {
+          expect(error).toBeInstanceOf(Error);
+          done();
+        });
+      });
+    });
+
+    describe('timeout', () => {
+      it('allows for a global timeout option to be set', () => {
+        const fetchRest = new FetchREST({
+          apiUrl: 'https://api.github.com',
+          timeout: 100,
+        });
+
+        mockSpecialFetch.abortableFetch();
+
+        const request = fetchRest.get('/users');
+        expect(setTimeout).toHaveBeenCalledTimes(1);
+        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 100);
+
+        jest.advanceTimersByTime(100);
+
+        return expect(request).rejects.toHaveProperty(
+          'message',
+          'DOMException: The user aborted a request.',
+        );
+      });
+
+      it('allows for a local timeout option to be set', () => {
+        const fetchRest = new FetchREST({
+          apiUrl: 'https://api.github.com',
+        });
+
+        mockSpecialFetch.abortableFetch();
+
+        const request = fetchRest.get('/users', {}, {timeout: 200});
+        expect(setTimeout).toHaveBeenCalledTimes(1);
+        expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 200);
+
+        jest.advanceTimersByTime(200);
+
+        return expect(request).rejects.toHaveProperty(
+          'message',
+          'DOMException: The user aborted a request.',
+        );
+      });
+
+      it('does not set a timeout when not specified', () => {
+        fetchMock.getOnce('*', {
+          status: 200,
+        });
+
+        const fetchRest = new FetchREST({
+          apiUrl: 'https://api.github.com',
+        });
+
+        const request = fetchRest.get('/users');
+        expect(setTimeout).not.toBeCalled();
+        expect(request).resolves.toHaveProperty('status', 200);
+      });
+    });
+  });
+
   describe('get', () => {
-    it('does a request to the correct endpoint and API URL', async () => {
+    it('sends the request to the right endpoint', async () => {
       const requestMock = fetchMock.getOnce('*', {
         status: 200,
       });
@@ -22,53 +295,9 @@ describe('FetchREST', () => {
       });
 
       await request.get('/users');
-      expect(requestMock.lastUrl()).toBe('https://testapi.com/users');
-    });
 
-    it('allows method instead of object literal as global request options', async () => {
-      const mockLocalStorage: MockLocalStorage = {};
-      const requestMock = fetchMock.get('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST(() => ({
-        apiUrl: 'https://testapi.com',
-        headers: {
-          Authorization: mockLocalStorage.authToken,
-        },
-      }));
-
-      await request.get('/users');
-      const beforeOptions = requestMock.lastOptions() as MockRequestOptions;
-      expect(beforeOptions.headers!.Authorization).toBeUndefined();
-
-      mockLocalStorage.authToken = 'Bearer sahas2164sagafsg1245sfsax';
-
-      await request.get('/users');
-
-      const afterOptions = requestMock.lastOptions() as MockRequestOptions;
-      expect(afterOptions.headers!.Authorization).toBe(
-        'Bearer sahas2164sagafsg1245sfsax',
-      );
-    });
-
-    it('sends the defined headers', async () => {
-      const requestMock = fetchMock.getOnce('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-
-      await request.get('/users');
-      const {headers} = requestMock.lastOptions() as MockRequestOptions;
-      expect(headers!.Accept).toBe('application/json');
-      expect(headers!['Content-Type']).toBe('application/json');
+      const lastUrl = requestMock.lastUrl();
+      expect(lastUrl).toBe('https://testapi.com/users');
     });
 
     it('allows for local overwrite of options', async () => {
@@ -83,51 +312,19 @@ describe('FetchREST', () => {
         },
       });
 
-      await request.get(
-        '/users',
-        {},
-        {
-          apiUrl: 'https://superapi.com',
-          headers: {
-            Accept: 'text/xml',
-          },
+      await request.get('/users', null, {
+        apiUrl: 'https://superapi.com',
+        headers: {
+          Accept: 'text/xml',
         },
-      );
+      });
 
       const {headers} = requestMock.lastOptions() as MockRequestOptions;
       expect(headers!.Accept).toBe('text/xml');
       expect(requestMock.lastUrl()).toBe('https://superapi.com/users');
     });
 
-    it('merges global headers with nested local headers', async () => {
-      const requestMock = fetchMock.getOnce('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-
-      await request.get(
-        '/users',
-        {},
-        {
-          headers: {
-            Accept: 'text/xml',
-          },
-        },
-      );
-
-      const {headers} = requestMock.lastOptions() as MockRequestOptions;
-      expect(headers!.Accept).toBe('text/xml');
-      expect(headers!['Content-Type']).toBe('application/json');
-    });
-
-    it('does not pass the API URL to the fetch options', async () => {
+    it('allows a request without a query', async () => {
       const requestMock = fetchMock.getOnce('*', {
         status: 200,
       });
@@ -137,78 +334,8 @@ describe('FetchREST', () => {
       });
 
       await request.get('/users');
-
-      const {apiUrl} = requestMock.lastOptions() as MockRequestOptions & {
-        apiUrl?: string;
-      };
-      expect(apiUrl).toBeUndefined();
-    });
-
-    it('returns JSON it gets back as an object', async () => {
-      fetchMock.getOnce('*', {
-        status: 200,
-        body: JSON.stringify({data: '12345'}),
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const {body} = await request.get('/users');
-      expect(typeof body).toBe('object');
-    });
-
-    it('returns non-JSON it gets back as plain text', async () => {
-      fetchMock.getOnce('*', {
-        status: 403,
-        body: 'Forbidden.',
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const {body} = await request.get('/users');
-      expect(body).toBe('Forbidden.');
-    });
-
-    it('returns a success boolean', async () => {
-      fetchMock.getOnce('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const {success} = await request.get('/users');
-      expect(success).toBeTruthy();
-    });
-
-    it('send a false success boolean when the status is not 200', async () => {
-      fetchMock.getOnce('*', {
-        status: 404,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const {success} = await request.get('/users/2617281');
-      expect(success).toBeFalsy();
-    });
-
-    it('returns the response status', async () => {
-      fetchMock.getOnce('*', {
-        status: 200,
-      });
-
-      const request = new FetchREST({
-        apiUrl: 'https://testapi.com',
-      });
-
-      const {status} = await request.get('/users');
-      expect(status).toBe(200);
+      const lastUrl = requestMock.lastUrl();
+      expect(lastUrl).toBe('https://testapi.com/users');
     });
 
     it('allows a query to be added to the URL', async () => {
@@ -229,72 +356,6 @@ describe('FetchREST', () => {
       expect(requestMock.lastUrl()).toBe(
         'https://testapi.com/search?limit=20&skip=10&sort=desc',
       );
-    });
-
-    it('allows a catch method to catch errors', done => {
-      const request = new FetchREST({
-        apiUrl: 'https://url/that/is/not/valid.com',
-      });
-
-      mockSpecialFetch.failingFetch();
-
-      request.get('/users').catch(error => {
-        expect(error).toBeInstanceOf(Error);
-        done();
-      });
-    });
-
-    it('allows for a global timeout option to be set', () => {
-      const fetchRest = new FetchREST({
-        apiUrl: 'https://api.github.com',
-        timeout: 100,
-      });
-
-      mockSpecialFetch.abortableFetch();
-
-      const request = fetchRest.get('/users');
-      expect(setTimeout).toHaveBeenCalledTimes(1);
-      expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 100);
-
-      jest.advanceTimersByTime(100);
-
-      return expect(request).rejects.toHaveProperty(
-        'message',
-        'DOMException: The user aborted a request.',
-      );
-    });
-
-    it('allows for a local timeout option to be set', () => {
-      const fetchRest = new FetchREST({
-        apiUrl: 'https://api.github.com',
-      });
-
-      mockSpecialFetch.abortableFetch();
-
-      const request = fetchRest.get('/users', {}, {timeout: 200});
-      expect(setTimeout).toHaveBeenCalledTimes(1);
-      expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 200);
-
-      jest.advanceTimersByTime(200);
-
-      return expect(request).rejects.toHaveProperty(
-        'message',
-        'DOMException: The user aborted a request.',
-      );
-    });
-
-    it('does not set a timeout when not specified', () => {
-      fetchMock.getOnce('*', {
-        status: 200,
-      });
-
-      const fetchRest = new FetchREST({
-        apiUrl: 'https://api.github.com',
-      });
-
-      const request = fetchRest.get('/users');
-      expect(setTimeout).not.toBeCalled();
-      expect(request).resolves.toHaveProperty('status', 200);
     });
   });
 
