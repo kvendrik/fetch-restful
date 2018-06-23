@@ -28,11 +28,11 @@ const fetchRest = new FetchREST(
 ### Request methods.
 
 ```ts
-await fetchRest.get('/users', QueryObject?, RequestOptions?);
-await fetchRest.post('/users', Payload?, RequestOptions?);
-await fetchRest.patch('/users', Payload?, RequestOptions?);
-await fetchRest.put('/users', Payload?, RequestOptions?);
-await fetchRest.delete('/users', Payload?, RequestOptions?);
+fetchRest.get(endpoint: string, QueryObject?, RequestOptions?): Promise<Response>;
+fetchRest.post(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
+fetchRest.put(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
+fetchRest.patch(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
+fetchRest.delete(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
 ```
 
 * [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
