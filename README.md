@@ -38,7 +38,7 @@ fetchRest.delete(endpoint: string, Payload?, RequestOptions?): Promise<Response>
 * [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/utilities/queryObjectToString/queryObjectToString.ts#L3) - object with query parameters to use.
 * [`Payload`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L7) - your request payload.
 * [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L17) - request options that will be merged with your global request options.
-* [`Response`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L9) - object the promise returns with all response data.
+* [`Response`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L9) - object that contains all response data.
 
 ### Middleware
 
