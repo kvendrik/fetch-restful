@@ -17,48 +17,49 @@ yarn add fetch-restful
 ### Constructor
 
 ```ts
-const request = new FetchREST(
+const fetchRest = new FetchREST(
   GlobalRequestOptions | GlobalRequestOptionsGetter,
 );
 ```
 
-* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L21) - request options that will be used as the defaults for every outgoing request.
-* [`GlobalRequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L25) - a method that returns a `GlobalRequestOptions` object.
+* [`GlobalRequestOptions`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L25) - request options that will be used as the defaults for every outgoing request.
+* [`GlobalRequestOptionsGetter`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L29) - a method that returns a `GlobalRequestOptions` object.
 
 ### Request methods.
 
 ```ts
-await request.get('/users', QueryObject, RequestOptions);
-await request.post('/users', Payload, RequestOptions);
-await request.patch('/users', Payload, RequestOptions);
-await request.put('/users', Payload, RequestOptions);
-await request.delete('/users', Payload, RequestOptions);
+fetchRest.get(endpoint: string, QueryObject?, RequestOptions?): Promise<Response>;
+fetchRest.post(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
+fetchRest.put(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
+fetchRest.patch(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
+fetchRest.delete(endpoint: string, Payload?, RequestOptions?): Promise<Response>;
 ```
 
-* [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/master/src/queryObjectToString.ts#L3) - object with query parameters to use.
-* [`Payload`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L3) - your request payload.
-* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L13) - request options that will be merged with your global request options.
+* [`QueryObject`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/utilities/queryObjectToString/queryObjectToString.ts#L3) - object with query parameters to use.
+* [`Payload`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L7) - your request payload.
+* [`RequestOptions`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L17) - request options that will be merged with your global request options.
+* [`Response`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L9) - object that contains all response data.
 
 ### Middleware
 
 Use the middleware method to define a function that will be added to the promise chain for all outgoing requests.
 
 ```ts
-request.middleware(Middleware);
+fetchRest.middleware(Middleware);
 ```
 
-* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/master/src/FetchREST.ts#L27) - method that will be added to the promise chain.
+* [`Middleware`](https://github.com/kvendrik/fetch-restful/blob/de72057a55983893c1fa709a031ba12eb31c3a73/src/FetchREST.ts#L31) - method that will be added to the promise chain.
 
 ## Examples
 
 ### Basic `GET`.
 
 ```ts
-const request = new FetchREST({
+const fetchRest = new FetchREST({
   apiUrl: 'https://api.github.com',
 });
 
-await request.get('/users/kvendrik');
+await fetchRest.get('/users/kvendrik');
 ```
 
 ### Basic `GET` with query.
@@ -91,7 +92,7 @@ await fetchRest.get('/users/kvendrik');
 ### Setting global headers.
 
 ```ts
-const request = new FetchREST({
+const fetchRest = new FetchREST({
   apiUrl: 'https://api.github.com',
   headers: {
     'Content-Type': 'application/json',
@@ -99,13 +100,13 @@ const request = new FetchREST({
   },
 });
 
-await request.get('/users/kvendrik');
+await fetchRest.get('/users/kvendrik');
 ```
 
 ### Locally adding and/or overriding headers.
 
 ```ts
-const request = new FetchREST({
+const fetchRest = new FetchREST({
   apiUrl: 'https://api.github.com',
   headers: {
     'Content-Type': 'application/json',
@@ -113,7 +114,7 @@ const request = new FetchREST({
   },
 });
 
-await request.get(
+await fetchRest.get(
   '/users/kvendrik',
   {},
   {
